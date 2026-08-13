@@ -11,10 +11,15 @@ import json
 import hashlib
 import os
 import re
+import sys
 import urllib.parse
 from datetime import datetime, date
 from decimal import Decimal
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
+
+_BACKEND_DIR = os.path.dirname(os.path.abspath(__file__))
+if _BACKEND_DIR not in sys.path:
+    sys.path.insert(0, _BACKEND_DIR)
 
 from config import HOST, PORT, FRONTEND_DIR
 from database import query, execute

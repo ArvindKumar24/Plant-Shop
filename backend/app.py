@@ -11,11 +11,16 @@ Run locally (optional):
 import base64
 import hashlib
 import os
+import sys
 import urllib.parse
 from datetime import datetime, date
 from decimal import Decimal
 
 from flask import Flask, jsonify, request, send_from_directory
+
+_BACKEND_DIR = os.path.dirname(os.path.abspath(__file__))
+if _BACKEND_DIR not in sys.path:
+    sys.path.insert(0, _BACKEND_DIR)
 
 from database import query, execute
 from config import FRONTEND_DIR
