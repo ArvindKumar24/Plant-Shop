@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>All Plants - GreenLeaf Plants</title>
+  <link rel="stylesheet" href="css/styles.css" />
+</head>
+<body>
+  <header class="site-header">
+    <div class="header-inner">
+      <a href="index.html" class="logo"><span>🌿</span> GreenLeaf Plants</a>
+      <nav class="nav-links">
+        <a href="index.html">Home</a>
+        <a href="products.html?category=indoor">Indoor</a>
+        <a href="products.html?category=outdoor">Outdoor</a>
+<a href="products.html">All Plants</a>
+<a href="orders.html">My Orders</a>
+<a href="cart.html" class="cart-link">🛒<span class="cart-count" id="cart-count">0</span></a>
+        <span id="auth-nav"></span>
+      </nav>
+    </div>
+  </header>
+
+  <main class="container">
+    <h1 class="section-title">Shop Plants</h1>
+
+    <!-- Filters -->
+    <div class="filters-bar">
+      <div>
+        <label for="search">Search</label>
+        <input type="text" id="search" placeholder="Search plants..." />
+      </div>
+      <div>
+        <label for="category">Category</label>
+        <select id="category">
+          <option value="">All</option>
+          <option value="indoor">Indoor</option>
+          <option value="outdoor">Outdoor</option>
+        </select>
+      </div>
+      <div>
+        <label for="plant_type">Plant Type</label>
+        <select id="plant_type">
+          <option value="">All</option>
+          <option value="Succulent">Succulent</option>
+          <option value="Foliage">Foliage</option>
+          <option value="Flowering">Flowering</option>
+          <option value="Herb">Herb</option>
+          <option value="Vegetable">Vegetable</option>
+        </select>
+      </div>
+      <div>
+        <label for="min_price">Min Price (₹)</label>
+        <input type="number" id="min_price" min="0" step="0.01" placeholder="0" />
+      </div>
+      <div>
+        <label for="max_price">Max Price (₹)</label>
+        <input type="number" id="max_price" min="0" step="0.01" placeholder="100" />
+      </div>
+      <div>
+        <button class="btn" id="apply-filters">Apply</button>
+        <button class="btn btn-outline" id="clear-filters">Clear</button>
+      </div>
+    </div>
+
+    <div class="product-grid" id="product-grid">
+      <!-- Populated by JS -->
+    </div>
+    <div id="result-count" style="text-align:center;color:var(--text-light);margin-bottom:1rem;"></div>
+  </main>
+
+  <footer class="site-footer">
+    <p>&copy; 2024 GreenLeaf Plants. All rights reserved.</p>
+  </footer>
+
+<script src="js/api.js"></script>
+  <script src="js/cart.js"></script>
+  <script src="js/auth.js"></script>
+  <script src="js/main.js"></script>
+  <script src="js/products.js"></script>
+</body>
+</html>

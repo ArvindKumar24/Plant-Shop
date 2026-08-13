@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Admin Dashboard - GreenLeaf Plants</title>
+  <link rel="stylesheet" href="css/styles.css" />
+</head>
+<body>
+  <header class="site-header">
+    <div class="header-inner">
+      <a href="index.html" class="logo"><span>🌿</span> GreenLeaf Admin</a>
+      <nav class="nav-links">
+        <a href="javascript:void(0)" onclick="viewStore()">View Store</a>
+        <a href="admin.html">Admin</a>
+      </nav>
+    </div>
+  </header>
+
+  <!-- Login view -->
+  <div class="admin-login" id="login-view">
+    <div class="login-box">
+      <h2 style="text-align:center;margin-bottom:1.5rem;color:var(--primary-dark)">Admin Login</h2>
+      <div class="form-group">
+        <label>Username</label>
+        <input type="text" id="admin-username" placeholder="admin" />
+      </div>
+      <div class="form-group">
+        <label>Password</label>
+        <input type="password" id="admin-password" placeholder="password" />
+      </div>
+      <button class="btn btn-block" id="admin-login-btn">Login</button>
+      <p id="login-error" style="color:var(--danger);text-align:center;margin-top:0.8rem;min-height:1.2em"></p>
+    </div>
+  </div>
+
+  <!-- Admin panel view -->
+  <div class="admin-panel" id="panel-view" style="display:none">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1rem;flex-wrap:wrap;gap:0.5rem">
+      <h2>Admin Dashboard</h2>
+      <button class="btn btn-outline" id="logout-btn">Logout</button>
+    </div>
+
+    <div class="admin-tabs">
+      <button class="active" data-tab="products">Products</button>
+      <button data-tab="orders">Orders</button>
+      <button data-tab="settings">Payment Settings</button>
+    </div>
+
+    <!-- Products tab -->
+    <div class="admin-tab active" id="tab-products">
+      <div style="margin-bottom:1rem">
+        <button class="btn" id="add-product-btn">+ Add New Product</button>
+      </div>
+      <div id="products-table-container"></div>
+    </div>
+
+    <!-- Orders tab -->
+    <div class="admin-tab" id="tab-orders">
+      <div id="orders-table-container"></div>
+    </div>
+
+    <!-- Settings tab -->
+    <div class="admin-tab" id="tab-settings">
+      <div class="checkout-section">
+        <h3>UPI QR Code Settings</h3>
+        <div class="form-group">
+          <label>UPI ID (Virtual Payment Address)</label>
+          <input type="text" id="upi-id" value="greenleaf@upi" />
+        </div>
+        <div class="form-group">
+          <label>Payee Name</label>
+          <input type="text" id="upi-name" value="GreenLeaf Plants" />
+        </div>
+        <button class="btn" id="save-upi-btn">Save & Generate QR</button>
+        <div class="upi-qr" style="margin-top:1rem">
+          <img id="settings-qr" src="https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=upi://pay?pa=greenleaf@upi&pn=GreenLeaf%20Plants" alt="UPI QR" />
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Product add/edit modal -->
+  <div class="modal-overlay" id="product-modal" style="display:none">
+    <div class="modal">
+      <h3 id="modal-title">Add Product</h3>
+      <div class="form-group">
+        <label>Name *</label>
+        <input type="text" id="p-name" />
+      </div>
+      <div class="form-group">
+        <label>Category *</label>
+        <select id="p-category">
+          <option value="indoor">Indoor</option>
+          <option value="outdoor">Outdoor</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>Plant Type</label>
+        <input type="text" id="p-plant_type" placeholder="e.g. Succulent, Foliage, Herb" />
+      </div>
+      <div class="form-group">
+        <label>Price (₹) *</label>
+        <input type="number" id="p-price" min="0" step="0.01" />
+      </div>
+      <div class="form-group">
+        <label>Stock</label>
+        <input type="number" id="p-stock" min="0" />
+      </div>
+      <div class="form-group">
+        <label>Image URL</label>
+        <input type="text" id="p-image_url" placeholder="https://..." />
+      </div>
+      <div class="form-group">
+        <label>Description</label>
+        <textarea id="p-description"></textarea>
+      </div>
+      <div class="modal-actions">
+        <button class="btn btn-outline" id="modal-cancel">Cancel</button>
+        <button class="btn" id="modal-save">Save Product</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="js/api.js"></script>
+  <script src="js/main.js"></script>
+  <script src="js/admin.js"></script>
+</body>
+</html>

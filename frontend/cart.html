@@ -1,0 +1,87 @@
+ <!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Your Cart - GreenLeaf Plants</title>
+  <link rel="stylesheet" href="css/styles.css" />
+</head>
+<body>
+  <header class="site-header">
+    <div class="header-inner">
+      <a href="index.html" class="logo"><span>🌿</span> GreenLeaf Plants</a>
+      <nav class="nav-links">
+        <a href="index.html">Home</a>
+        <a href="products.html?category=indoor">Indoor</a>
+        <a href="products.html?category=outdoor">Outdoor</a>
+<a href="products.html">All Plants</a>
+        <a href="orders.html">My Orders</a>
+        <a href="cart.html" class="cart-link">🛒<span class="cart-count" id="cart-count">0</span></a>
+        <span id="auth-nav"></span>
+      </nav>
+    </div>
+  </header>
+
+  <main class="container">
+    <h1 class="section-title">Your Cart</h1>
+    <div id="cart-container">
+      <div class="empty"><h2>Loading...</h2></div>
+    </div>
+  </main>
+
+  <footer class="site-footer">
+    <p>&copy; 2024 GreenLeaf Plants. All rights reserved.</p>
+  </footer>
+
+<script src="js/api.js"></script>
+  <script src="js/cart.js"></script>
+  <script src="js/auth.js"></script>
+  <script src="js/main.js"></script>
+  <script>
+    function renderCart() {
+      const cart = getCart();
+      const container = document.getElementById("cart-container");
+      if (cart.length === 0) {
+        container.innerHTML = `
+          <div class="empty">
+            <h2>Your cart is empty</h2>
+            <p>Add some beautiful plants to get started!</p>
+            <a href="products.html" class="btn">Shop Plants</a>
+          </div>`;
+        return;
+      }
+      container.innerHTML = `
+        <div class="cart-items">
+          ${cart.map((item) => `
+            <div class="cart-item">
+              <img src="${item.image_url || 'https://via.placeholder.com/200x200/4caf50/ffffff?text=Plant'}" alt="${item.name}" onerror="this.src='https://via.placeholder.com/200x200/4caf50/ffffff?text=Plant';this.classList.add('no-img')">
+              <div class="item-info">
+                <h4>${item.name}</h4>
+                <div class="item-price">${formatPrice(item.price)}</div>
+              </div>
+              <div>
+                <label style="font-size:0.8rem;color:var(--text-light)">Qty</label>
+                <input type="number" min="1" value="${item.quantity}" onchange="updateCartItem(${item.product_id}, this.value); renderCart();" />
+              </div>
+              <div class="item-price" style="font-size:1.1rem">${formatPrice(item.price * item.quantity)}</div>
+              <button class="btn btn-danger" onclick="removeFromCart(${item.product_id}); renderCart();">Remove</button>
+            </div>
+          `).join("")}
+        </div>
+        <div class="cart-summary">
+          <div class="row"><span>Items</span><span>${cartItemCount()}</span></div>
+          <div class="row"><span>Subtotal</span><span>${formatPrice(cartTotal())}</span></div>
+          <div class="total">Total: ${formatPrice(cartTotal())}</div>
+          <a href="checkout.html" class="btn btn-block" style="margin-top:1rem">Proceed to Checkout</a>
+          <a href="products.html" class="btn btn-outline btn-block" style="margin-top:0.5rem">Continue Shopping</a>
+        </div>
+      `;
+    }
+
+document.addEventListener("DOMContentLoaded", () => {
+      if (!requireAuth()) return;
+      renderCart();
+    });
+  </script>
+</body>
+</html>

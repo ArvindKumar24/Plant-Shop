@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>GreenLeaf Plants - Indoor & Outdoor Plant Shop</title>
+  <link rel="stylesheet" href="css/styles.css" />
+</head>
+<body>
+  <header class="site-header">
+    <div class="header-inner">
+      <a href="index.html" class="logo"><span>🌿</span> GreenLeaf Plants</a>
+      <nav class="nav-links">
+        <a href="index.html">Home</a>
+        <a href="products.html?category=indoor">Indoor</a>
+        <a href="products.html?category=outdoor">Outdoor</a>
+<a href="products.html">All Plants</a>
+        <a href="orders.html">My Orders</a>
+        <a href="cart.html" class="cart-link">🛒<span class="cart-count" id="cart-count">0</span></a>
+        <span id="auth-nav"></span>
+      </nav>
+    </div>
+  </header>
+
+  <section class="hero">
+    <h1>Bring Nature Home</h1>
+    <p>Beautiful indoor & outdoor plants for every space</p>
+    <a href="products.html" class="btn">Shop All Plants</a>
+  </section>
+
+  <main class="container">
+    <h2 class="section-title">Featured At a Glance</h2>
+    <div class="product-grid" id="featured-grid">
+      <!-- Populated by JS -->
+    </div>
+  </main>
+
+  <footer class="site-footer">
+    <p>&copy; 2024 GreenLeaf Plants. All rights reserved.</p>
+  </footer>
+
+<script src="js/api.js"></script>
+  <script src="js/cart.js"></script>
+  <script src="js/auth.js"></script>
+  <script src="js/main.js"></script>
+  <script>
+    document.addEventListener("DOMContentLoaded", async () => {
+      const grid = document.getElementById("featured-grid");
+      try {
+const data = await API.getProducts();
+        const products = (data.products || []).slice(0, 4);
+        registerProducts(products);
+        grid.innerHTML = products.map((p) => `
+          <div class="product-card">
+            <a href="product.html?id=${p.id}">
+              <div class="img-wrap"><img src="${productImage(p)}" alt="${p.name}" loading="lazy" onerror="this.src='https://via.placeholder.com/400x300/4caf50/ffffff?text=Plant';this.classList.add('no-img')"></div>
+            </a>
+            <div class="product-body">
+              <span class="badge ${p.category}">${p.category}</span>
+              <h3><a href="product.html?id=${p.id}">${p.name}</a></h3>
+              <div class="price">${formatPrice(p.price)}</div>
+              <p class="desc">${p.description || ''}</p>
+              <div class="product-actions">
+<button class="btn" onclick="addToCartById(${p.id}, 1)">Add to Cart</button>
+                <a href="product.html?id=${p.id}" class="btn btn-outline">View</a>
+              </div>
+            </div>
+          </div>
+        `).join("");
+      } catch (e) {
+        grid.innerHTML = `<div class="empty"><h2>Could not load products</h2><p>Please check the server and database.</p></div>`;
+      }
+    });
+  </script>
+</body>
+</html>

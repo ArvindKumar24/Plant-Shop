@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Register - GreenLeaf Plants</title>
+  <link rel="stylesheet" href="css/styles.css" />
+</head>
+<body>
+  <header class="site-header">
+    <div class="header-inner">
+      <a href="index.html" class="logo"><span>🌿</span> GreenLeaf Plants</a>
+      <nav class="nav-links">
+        <a href="index.html">Home</a>
+        <a href="products.html?category=indoor">Indoor</a>
+        <a href="products.html?category=outdoor">Outdoor</a>
+<a href="products.html">All Plants</a>
+        <a href="orders.html">My Orders</a>
+        <a href="cart.html" class="cart-link">🛒<span class="cart-count" id="cart-count">0</span></a>
+        <span id="auth-nav"></span>
+      </nav>
+    </div>
+  </header>
+
+  <main class="container">
+    <div class="login-box">
+      <h2 style="text-align:center;margin-bottom:1.5rem;color:var(--primary-dark)">Create Account 🌱</h2>
+      <p style="text-align:center;color:var(--text-light);margin-bottom:1.5rem">Register to add plants to your cart and checkout.</p>
+      <div class="form-group">
+        <label for="name">Full Name *</label>
+        <input type="text" id="name" placeholder="Your name" />
+      </div>
+      <div class="form-group">
+        <label for="email">Email *</label>
+        <input type="email" id="email" placeholder="you@example.com" />
+      </div>
+      <div class="form-group">
+        <label for="phone">Phone</label>
+        <input type="tel" id="phone" placeholder="+91 55555 55555" />
+      </div>
+      <div class="form-group">
+        <label for="password">Password *</label>
+        <input type="password" id="password" placeholder="At least 4 characters" />
+      </div>
+      <div class="form-group">
+        <label for="confirm">Confirm Password *</label>
+        <input type="password" id="confirm" placeholder="Repeat password" />
+      </div>
+      <button class="btn btn-block" id="register-btn">Create Account</button>
+      <p id="reg-error" style="color:var(--danger);text-align:center;margin-top:0.8rem;min-height:1.2em"></p>
+      <p style="text-align:center;margin-top:1rem;color:var(--text-light)">
+        Already have an account? <a href="login.html" style="color:var(--primary);font-weight:600">Login</a>
+      </p>
+    </div>
+  </main>
+
+  <footer class="site-footer">
+    <p>&copy; 2024 GreenLeaf Plants. All rights reserved.</p>
+  </footer>
+
+  <script src="js/api.js"></script>
+  <script src="js/cart.js"></script>
+  <script src="js/auth.js"></script>
+  <script src="js/main.js"></script>
+  <script src="js/register.js"></script>
+</body>
+</html>

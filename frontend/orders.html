@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>My Orders - GreenLeaf Plants</title>
+  <link rel="stylesheet" href="css/styles.css" />
+</head>
+<body>
+  <header class="site-header">
+    <div class="header-inner">
+      <a href="index.html" class="logo"><span>🌿</span> GreenLeaf Plants</a>
+      <nav class="nav-links">
+        <a href="index.html">Home</a>
+        <a href="products.html?category=indoor">Indoor</a>
+        <a href="products.html?category=outdoor">Outdoor</a>
+        <a href="products.html">All Plants</a>
+        <a href="orders.html">My Orders</a>
+        <a href="cart.html" class="cart-link">🛒<span class="cart-count" id="cart-count">0</span></a>
+        <span id="auth-nav"></span>
+      </nav>
+    </div>
+  </header>
+
+  <main class="container"style="min-height: calc(100vh - 180px);>
+    <h1 class="section-title">My Orders</h1>
+    <div id="orders-container">
+      <div class="empty"><h2>Loading...</h2></div>
+    </div>
+  </main>
+
+  <footer class="site-footer" st>
+    <p>&copy; 2024 GreenLeaf Plants. All rights reserved.</p>
+  </footer>
+
+  <script src="js/api.js"></script>
+  <script src="js/cart.js"></script>
+  <script src="js/auth.js"></script>
+  <script src="js/main.js"></script>
+  <script src="js/orders.js"></script>
+</body>
+</html>

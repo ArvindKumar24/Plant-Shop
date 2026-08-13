@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Product Details - GreenLeaf Plants</title>
+  <link rel="stylesheet" href="css/styles.css" />
+</head>
+<body>
+  <header class="site-header">
+    <div class="header-inner">
+      <a href="index.html" class="logo"><span>🌿</span> GreenLeaf Plants</a>
+      <nav class="nav-links">
+        <a href="index.html">Home</a>
+        <a href="products.html?category=indoor">Indoor</a>
+        <a href="products.html?category=outdoor">Outdoor</a>
+<a href="products.html">All Plants</a>
+<a href="orders.html">My Orders</a>
+<a href="cart.html" class="cart-link">🛒<span class="cart-count" id="cart-count">0</span></a>
+        <span id="auth-nav"></span>
+      </nav>
+    </div>
+  </header>
+
+  <main class="container">
+    <div id="detail-container">
+      <div class="empty"><h2>Loading...</h2></div>
+    </div>
+  </main>
+
+  <footer class="site-footer">
+    <p>&copy; 2024 GreenLeaf Plants. All rights reserved.</p>
+  </footer>
+
+  <script src="js/api.js"></script>
+  <script src="js/cart.js"></script>
+  <script src="js/auth.js"></script>
+  <script src="js/main.js"></script>
+  <script>
+    document.addEventListener("DOMContentLoaded", async () => {
+      const id = new URLSearchParams(window.location.search).get("id");
+      const container = document.getElementById("detail-container");
+      if (!id) {
+        container.innerHTML = `<div class="empty"><h2>Invalid product</h2><a href="products.html" class="btn">Back to shop</a></div>`;
+        return;
+      }
+      try {
+        const data = await API.getProduct(id);
+        if (!data.product) {
+          container.innerHTML = `<div class="empty"><h2>Product not found</h2><a href="products.html" class="btn">Back to shop</a></div>`;
+          return;
+        }
+const p = data.product;
+        registerProduct(p);
+        const stockLabel = p.stock <= 0 ? '<span class="badge stock-out">Out of Stock</span>'
+                        : p.stock <= 5 ? '<span class="badge stock-low">Low Stock</span>'
+                        : '<span class="badge" style="background:#e8f5e9;color:#2e7d32">In Stock</span>';
+        container.innerHTML = `
+          <div class="product-detail">
+            <div>
+              <img src="${productImage(p)}" alt="${p.name}" class="detail-img" onerror="this.src='https://via.placeholder.com/600x400/4caf50/ffffff?text=Plant';this.classList.add('no-img')">
+            </div>
+            <div class="detail-info">
+              <span class="badge ${p.category}">${p.category}</span>
+              <h1>${p.name}</h1>
+              <div class="detail-meta">
+                <span class="badge" style="background:#e8f5e9;color:#2e7d32">${p.plant_type}</span>
+                ${stockLabel}
+              </div>
+              <div class="price">${formatPrice(p.price)}</div>
+              <p class="desc">${p.description || "No description available."}</p>
+<div class="qty-control">
+                <button onclick="changeQty(-1)">−</button>
+                <input type="number" id="qty" value="1" min="1" max="${p.stock || 1}" />
+                <button onclick="changeQty(1)">+</button>
+              </div>
+              <button class="btn btn-block" ${p.stock <= 0 ? 'disabled style="opacity:0.5;cursor:not-allowed"' : ""} onclick="addToCartById(${p.id}, document.getElementById('qty').value)">
+                ${p.stock <= 0 ? "Out of Stock" : "Add to Cart"}
+              </button>
+              <a href="products.html" class="btn btn-outline btn-block" style="margin-top:0.8rem">Continue Shopping</a>
+            </div>
+          </div>
+        `;
+      } catch (e) {
+        container.innerHTML = `<div class="empty"><h2>Could not load product</h2><p>Please check the server and database.</p></div>`;
+      }
+    });
+
+    function changeQty(delta) {
+      const input = document.getElementById("qty");
+      const val = parseInt(input.value, 10) || 1;
+      const max = parseInt(input.max, 10) || 99;
+      const next = Math.min(max, Math.max(1, val + delta));
+      input.value = next;
+    }
+  </script>
+</body>
+</html>
