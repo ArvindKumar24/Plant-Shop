@@ -398,7 +398,13 @@ def handle_admin_update_product(pid):
 def handle_admin_delete_product(pid):
     if not _check_admin():
         return _json({"error": "Unauthorized"}, 401)
-    rowcount = execute("DELETE FROM products WHERE id = %s", (pid,))
+    try:
+        # Remove order_items rows referencing this product first. The FK has no
+        # ON DELETE CASCADE, so a product in any past order could not be deleted.
+        execute("DELETE FROM order_items WHERE product_id = %s", (pid,))
+        rowcount = execute("DELETE FROM products WHERE id = %s", (pid,))
+    except Exception as e:
+        return _json({"error": f"Could not delete product: {e}"}, 500)
     if rowcount == 0:
         return _json({"error": "Product not found"}, 404)
     return _json({"success": True, "id": pid})

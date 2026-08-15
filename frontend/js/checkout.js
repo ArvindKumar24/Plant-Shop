@@ -2,9 +2,21 @@
  * checkout.js - Checkout form, payment method selection, and order submission.
  */
 
-// Simulated UPI QR code (a data URI placeholder). In production, admin sets this.
-// The admin can update this via the backend config or DB. For now we use a static QR.
-const UPI_QR_CODE = "https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=upi://pay?pa=greenleaf@upi&pn=GreenLeaf%20Plants";
+// UPI payment details. The QR code is generated locally (see makeQrDataUrl)
+// using the vendored qrcode.js library, so it always renders without depending
+// on any external service.
+const UPI_ID = "greenleaf@upi";
+const UPI_NAME = "GreenLeaf Plants";
+const UPI_PAY_DATA = "upi://pay?pa=" + UPI_ID + "&pn=" + encodeURIComponent(UPI_NAME);
+
+/** Generate a UPI QR code as a data URL (blank if the library is unavailable). */
+function makeQrDataUrl(text, cellSize = 8, margin = 2) {
+  if (typeof qrcode !== "function") return "";
+  const qr = qrcode(0, "L");
+  qr.addData(text);
+  qr.make();
+  return qr.createDataURL(cellSize, margin);
+}
 
 let selectedPayment = "cash";
 
@@ -64,8 +76,9 @@ function renderCheckout() {
               <label><input type="radio" name="payment" value="upi" ${selectedPayment === 'upi' ? 'checked' : ''} /> 📱 UPI Payment</label>
               <div class="sub">Scan the QR code to pay instantly.</div>
               <div class="upi-qr" id="upi-qr" style="${selectedPayment === 'upi' ? '' : 'display:none'}">
-                <img src="${UPI_QR_CODE}" alt="UPI QR Code" />
+                <img src="${makeQrDataUrl(UPI_PAY_DATA)}" alt="UPI QR Code" />
                 <p style="font-size:0.85rem;color:var(--text-light);margin-top:0.4rem">Scan with any UPI app (GPay, PhonePe, Paytm)</p>
+                <p style="font-size:0.85rem;color:var(--text-light);margin-top:0.4rem">Pay to: <strong>${UPI_ID}</strong></p>
               </div>
             </div>
             <div class="payment-option ${selectedPayment === 'card' ? 'selected' : ''}" data-method="card">

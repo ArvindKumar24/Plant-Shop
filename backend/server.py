@@ -538,7 +538,14 @@ class PlantHandler(BaseHTTPRequestHandler):
         if not self._check_admin():
             self._json({"error": "Unauthorized"}, 401)
             return
-        rowcount = execute("DELETE FROM products WHERE id = %s", (pid,))
+        try:
+            # Remove order_items rows referencing this product first. The FK has
+            # no ON DELETE CASCADE, so a product in any past order could not be deleted.
+            execute("DELETE FROM order_items WHERE product_id = %s", (pid,))
+            rowcount = execute("DELETE FROM products WHERE id = %s", (pid,))
+        except Exception as e:
+            self._json({"error": f"Could not delete product: {e}"}, 500)
+            return
         if rowcount == 0:
             self._json({"error": "Product not found"}, 404)
             return

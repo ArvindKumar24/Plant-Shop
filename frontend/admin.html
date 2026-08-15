@@ -74,14 +74,14 @@
         </div>
         <button class="btn" id="save-upi-btn">Save & Generate QR</button>
         <div class="upi-qr" style="margin-top:1rem">
-          <img id="settings-qr" src="https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=upi://pay?pa=greenleaf@upi&pn=GreenLeaf%20Plants" alt="UPI QR" />
+          <img id="settings-qr" src="" alt="UPI QR" />
         </div>
       </div>
     </div>
   </div>
 
   <!-- Product add/edit modal -->
-  <div class="modal-overlay" id="product-modal" style="display:none">
+  <div class="modal-overlay" id="product-modal">
     <div class="modal">
       <h3 id="modal-title">Add Product</h3>
       <div class="form-group">
@@ -124,6 +124,7 @@
 
   <script src="js/api.js"></script>
   <script src="js/main.js"></script>
+  <script src="js/qrcode.js"></script>
   <script src="js/admin.js"></script>
 </body>
 </html>

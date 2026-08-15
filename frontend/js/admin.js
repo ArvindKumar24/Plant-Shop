@@ -228,15 +228,31 @@ async function loadOrders() {
 }
 
 // ---------- UPI Settings ----------
-document.getElementById("save-upi-btn").addEventListener("click", () => {
+/** Generate a QR code as a data URL (blank if the library is unavailable). */
+function generateQrDataUrl(text, cellSize = 8, margin = 2) {
+  if (typeof qrcode !== "function") return "";
+  const qr = qrcode(0, "L");
+  qr.addData(text);
+  qr.make();
+  return qr.createDataURL(cellSize, margin);
+}
+
+/** Render the admin UPI QR from the current ID/name inputs. */
+function refreshSettingsQr() {
   const upiId = document.getElementById("upi-id").value.trim();
   const name = document.getElementById("upi-name").value.trim();
   if (!upiId) { alert("UPI ID is required."); return; }
   const data = `upi://pay?pa=${encodeURIComponent(upiId)}&pn=${encodeURIComponent(name)}`;
-  document.getElementById("settings-qr").src =
-    `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(data)}`;
+  document.getElementById("settings-qr").src = generateQrDataUrl(data);
+}
+
+document.getElementById("save-upi-btn").addEventListener("click", () => {
+  refreshSettingsQr();
   showToast("QR code updated");
 });
+
+// Generate the QR immediately on load so the admin always sees it (no external service).
+refreshSettingsQr();
 
 // ---------- View Store ----------
 // When the admin clicks "View Store", clear the customer auth so the

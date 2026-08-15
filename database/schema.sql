@@ -61,10 +61,21 @@ CREATE TABLE orders (
 -- ============================================
 -- Order items table (one order -> many items)
 -- ============================================
+-- NOTE: product_id has ON DELETE CASCADE so deleting a product (admin panel)
+-- also removes its line items from order history. Order totals are stored on
+-- the orders row and are NOT affected by this.
+--
+-- If you already created your Supabase DB with the OLD schema (no cascade),
+-- run this one-time migration in the Supabase SQL Editor:
+--
+--   ALTER TABLE order_items DROP CONSTRAINT order_items_product_id_fkey;
+--   ALTER TABLE order_items ADD CONSTRAINT order_items_product_id_fkey
+--     FOREIGN KEY (product_id) REFERENCES products(id) ON DELETE CASCADE;
+--
 CREATE TABLE order_items (
   id         BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
   order_id   BIGINT NOT NULL REFERENCES orders(id) ON DELETE CASCADE,
-  product_id BIGINT NOT NULL REFERENCES products(id),
+  product_id BIGINT NOT NULL REFERENCES products(id) ON DELETE CASCADE,
   quantity   INT NOT NULL,
   price      NUMERIC(10,2) NOT NULL
 );
