@@ -1,0 +1,122 @@
+-- ============================================
+-- E-commerce Plant Website - 100 Product Seed
+-- PostgreSQL (Supabase)
+--
+-- Run this in the Supabase Dashboard:
+--   SQL Editor -> New query -> paste -> Run
+--
+-- Inserts 100 products (50 indoor, 50 outdoor) into the existing
+-- `products` table. image_url is intentionally left blank; the store
+-- frontend shows a placeholder image for products without a photo.
+-- ============================================
+
+INSERT INTO products (name, category, plant_type, price, description, image_url, stock) VALUES
+-- ---------- Indoor: Succulents & Cacti ----------
+('Snake Plant', 'indoor', 'Succulent', 349.00, 'Low-maintenance air purifier with tall upright leaves. Ideal for beginners and low light.', '', 40),
+('Aloe Vera', 'indoor', 'Succulent', 299.00, 'Healing succulent with soothing gel, perfect for a sunny windowsill.', '', 35),
+('Jade Plant', 'indoor', 'Succulent', 249.00, 'Round glossy leaves and a tree-like stem; a classic symbol of good luck.', '', 30),
+('Echeveria', 'indoor', 'Succulent', 199.00, 'Rosette-forming succulent with plump, colourful leaves.', '', 30),
+('Haworthia Zebra Plant', 'indoor', 'Succulent', 179.00, 'Small striped succulent that thrives on neglect, great for desks.', '', 25),
+('String of Pearls', 'indoor', 'Succulent', 229.00, 'Trailing beads of green that look stunning in hanging pots.', '', 20),
+('Burro''s Tail', 'indoor', 'Succulent', 219.00, 'Drooping, densely packed leaves for a striking hanging basket.', '', 20),
+('Christmas Cactus', 'indoor', 'Cactus', 279.00, 'Blooms bright flowers around the festive season, low care.', '', 18),
+('Golden Barrel Cactus', 'indoor', 'Cactus', 399.00, 'Round cactus with golden spines, a statement desert beauty.', '', 12),
+('Moon Cactus', 'indoor', 'Cactus', 189.00, 'Vibrant top-coloured cactus grafted on a rootstock, tiny and cute.', '', 25),
+-- ---------- Indoor: Foliage ----------
+('Monstera Deliciosa', 'indoor', 'Foliage', 799.00, 'Iconic split leaves that bring instant tropical charm indoors.', '', 15),
+('Monstera Adansonii', 'indoor', 'Foliage', 549.00, 'Swiss cheese plant with delicate holey leaves, perfect for shelves.', '', 15),
+('Fiddle Leaf Fig', 'indoor', 'Foliage', 1299.00, 'Statement tree with large glossy violin-shaped leaves.', '', 8),
+('Rubber Plant', 'indoor', 'Foliage', 599.00, 'Bold dark-green leaves on an easy-growing upright plant.', '', 20),
+('Golden Pothos', 'indoor', 'Foliage', 249.00, 'Fast-growing trailing vine with marbled golden-green leaves.', '', 30),
+('Neon Pothos', 'indoor', 'Foliage', 279.00, 'Striking lime-green leaves that brighten any corner.', '', 25),
+('Philodendron Brasil', 'indoor', 'Foliage', 329.00, 'Heart-shaped leaves splashed with yellow-green variegation.', '', 25),
+('Peace Lily', 'indoor', 'Flowering', 449.00, 'Elegant white blooms and dark leaves; thrives in low light.', '', 20),
+('ZZ Plant', 'indoor', 'Foliage', 699.00, 'Glossy, waxy leaves that survive almost any condition.', '', 18),
+('Spider Plant', 'indoor', 'Foliage', 299.00, 'Arching green leaves with baby plantlets; excellent air purifier.', '', 28),
+('Calathea Orbifolia', 'indoor', 'Foliage', 549.00, 'Large round leaves with silver stripes, a show-stopper.', '', 12),
+('Calathea Rattlesnake', 'indoor', 'Foliage', 499.00, 'Wavy patterned leaves with a deep purple underside.', '', 12),
+('Boston Fern', 'indoor', 'Foliage', 379.00, 'Fluffy, arching fronds perfect for hanging baskets.', '', 16),
+('Maidenhair Fern', 'indoor', 'Foliage', 329.00, 'Delicate fan-shaped fronds, ideal for humid bathrooms.', '', 14),
+('Areca Palm', 'indoor', 'Palm', 999.00, 'Feathery palm that adds a resort vibe and purifies air.', '', 10),
+('Parlor Palm', 'indoor', 'Palm', 749.00, 'Compact elegant palm that grows happily in low light.', '', 12),
+('Dragon Tree', 'indoor', 'Foliage', 649.00, 'Sword-shaped leaves with red edges on a sculptural trunk.', '', 14),
+('Dieffenbachia', 'indoor', 'Foliage', 429.00, 'Dumb cane with bold cream-green variegated foliage.', '', 15),
+('Chinese Evergreen', 'indoor', 'Foliage', 379.00, 'Silvery-green leaves that tolerate shade and neglect.', '', 18),
+('Corn Plant', 'indoor', 'Foliage', 579.00, 'Dracaena with arching green and yellow-striped leaves.', '', 15),
+('Umbrella Plant', 'indoor', 'Foliage', 469.00, 'Schefflera with glossy finger-like leaflets, easy to grow.', '', 16),
+('Prayer Plant', 'indoor', 'Foliage', 399.00, 'Leaves that fold up at night, patterned in deep green and red.', '', 15),
+('Money Tree', 'indoor', 'Foliage', 899.00, 'Braided-trunk plant said to bring wealth and good luck.', '', 10),
+('Cast Iron Plant', 'indoor', 'Foliage', 449.00, 'Tough, almost unkillable foliage for the darkest corners.', '', 18),
+('Yucca', 'indoor', 'Foliage', 549.00, 'Spiky architectural plant that needs very little care.', '', 12),
+('Alocasia', 'indoor', 'Foliage', 699.00, 'Dramatic arrow-shaped leaves with prominent veins.', '', 12),
+('Lucky Bamboo', 'indoor', 'Bamboo', 199.00, 'Easy stalks that grow in water, symbols of luck and prosperity.', '', 40),
+('Air Plant', 'indoor', 'Foliage', 149.00, 'Soil-free Tillandsia that absorbs moisture from the air.', '', 35),
+('Ponytail Palm', 'indoor', 'Palm', 799.00, 'Bulbous trunk with cascading grassy leaves, quirky and hardy.', '', 12),
+('Fittonia Nerve Plant', 'indoor', 'Foliage', 249.00, 'Delicate leaves veined in white or pink, great in terrariums.', '', 20),
+-- ---------- Indoor: Flowering ----------
+('Anthurium', 'indoor', 'Flowering', 649.00, 'Glossy red spathes with heart-shaped leaves, blooms year-round.', '', 12),
+('Moth Orchid', 'indoor', 'Flowering', 899.00, 'Phalaenopsis orchid with elegant long-lasting blooms.', '', 10),
+('Bromeliad', 'indoor', 'Flowering', 599.00, 'Colourful bracts and rosette leaves, tropical and exotic.', '', 12),
+('African Violet', 'indoor', 'Flowering', 179.00, 'Compact plant with velvety leaves and pretty purple blooms.', '', 20),
+('Begonia', 'indoor', 'Flowering', 229.00, 'Cheerful flowers with interesting textured foliage.', '', 18),
+('Cyclamen', 'indoor', 'Flowering', 279.00, 'Upswept blooms in pink, white or red above patterned leaves.', '', 15),
+('Gerbera Daisy', 'indoor', 'Flowering', 219.00, 'Big bright daisy flowers on sturdy stems.', '', 15),
+('Kalanchoe', 'indoor', 'Flowering', 249.00, 'Long-lasting clusters of red, pink or yellow flowers.', '', 18),
+-- ---------- Indoor: Herbs ----------
+('Tulsi', 'indoor', 'Herb', 99.00, 'Sacred basil with aromatic leaves, used in Ayurveda.', '', 30),
+('Rosemary', 'indoor', 'Herb', 129.00, 'Fragrant needle-like leaves, perfect for cooking and teas.', '', 25),
+-- ---------- Outdoor: Flowering ----------
+('Rose Bush', 'outdoor', 'Flowering', 449.00, 'Classic fragrant roses for your garden, easy to grow.', '', 20),
+('Hibiscus', 'outdoor', 'Flowering', 349.00, 'Big showy blooms in red, pink or yellow all summer.', '', 18),
+('Jasmine Mogra', 'outdoor', 'Flowering', 299.00, 'Intensely fragrant white flowers, adored for garlands.', '', 22),
+('Marigold', 'outdoor', 'Flowering', 59.00, 'Cheerful golden-orange blooms, a festival favourite.', '', 40),
+('Sunflower', 'outdoor', 'Flowering', 99.00, 'Tall sunny blooms that brighten any garden.', '', 35),
+('Lavender', 'outdoor', 'Flowering', 279.00, 'Aromatic purple spikes loved by bees and butterflies.', '', 25),
+('Dahlia', 'outdoor', 'Flowering', 199.00, 'Showy multi-petal blooms in every colour imaginable.', '', 20),
+('Chrysanthemum', 'outdoor', 'Flowering', 179.00, 'Long-lasting blooms in rich autumnal colours.', '', 22),
+('Hydrangea', 'outdoor', 'Flowering', 549.00, 'Large ball-shaped flower clusters in blue, pink or white.', '', 10),
+('Bougainvillea', 'outdoor', 'Flowering', 399.00, 'Vigorous climber exploding with colourful papery bracts.', '', 15),
+('Petunia', 'outdoor', 'Flowering', 79.00, 'Cascading trumpet blooms, perfect for pots and borders.', '', 35),
+('Zinnia', 'outdoor', 'Flowering', 89.00, 'Vivid daisy flowers that attract butterflies.', '', 30),
+('Geranium', 'outdoor', 'Flowering', 169.00, 'Bright flower heads over scalloped green leaves.', '', 20),
+('Tulip', 'outdoor', 'Flowering', 299.00, 'Elegant cup-shaped blooms on slender stems.', '', 15),
+('Ixora', 'outdoor', 'Flowering', 249.00, 'Clusters of tiny starry red flowers in dense heads.', '', 18),
+('Plumeria Frangipani', 'outdoor', 'Flowering', 399.00, 'Fragrant tropical flowers on a graceful small tree.', '', 12),
+('Lantana', 'outdoor', 'Flowering', 99.00, 'Colour-changing flower clusters, tough and drought-hardy.', '', 25),
+('Celosia', 'outdoor', 'Flowering', 89.00, 'Fluffy plume or crested blooms in bold hot colours.', '', 25),
+('Cosmos', 'outdoor', 'Flowering', 79.00, 'Delicate daisy blooms on airy stems, great for cutting.', '', 30),
+('Portulaca', 'outdoor', 'Flowering', 69.00, 'Sun-loving ground cover with jewel-like blooms.', '', 35),
+-- ---------- Outdoor: Herbs ----------
+('Basil', 'outdoor', 'Herb', 79.00, 'Fresh culinary basil, a must for every kitchen garden.', '', 40),
+('Mint', 'outdoor', 'Herb', 69.00, 'Refreshing mint for teas, mojitos and cooking.', '', 40),
+('Thyme', 'outdoor', 'Herb', 99.00, 'Low-growing aromatic herb with tiny leaves.', '', 30),
+('Oregano', 'outdoor', 'Herb', 99.00, 'Classic pizza herb with a warm, savoury flavour.', '', 30),
+('Coriander', 'outdoor', 'Herb', 49.00, 'Cilantro for fresh garnishes and chutneys.', '', 45),
+('Curry Leaf', 'outdoor', 'Herb', 199.00, 'Aromatic leaves essential for Indian tempering.', '', 20),
+('Lemongrass', 'outdoor', 'Herb', 99.00, 'Citrusy grass used in teas and Asian cooking.', '', 25),
+('Fenugreek Methi', 'outdoor', 'Herb', 39.00, 'Fast-growing greens for saag and spice seeds.', '', 40),
+-- ---------- Outdoor: Vegetables ----------
+('Tomato', 'outdoor', 'Vegetable', 89.00, 'Homegrown juicy tomatoes, great for vegetable gardens.', '', 35),
+('Chilli', 'outdoor', 'Vegetable', 69.00, 'Hot green chillies, a must for spicy Indian cooking.', '', 35),
+('Capsicum', 'outdoor', 'Vegetable', 79.00, 'Crunchy bell peppers in green, red or yellow.', '', 25),
+('Brinjal Eggplant', 'outdoor', 'Vegetable', 89.00, 'Glossy purple aubergines for curries and bharwan.', '', 22),
+('Cucumber', 'outdoor', 'Vegetable', 79.00, 'Crisp climbing cucumbers for fresh salads.', '', 20),
+('Radish', 'outdoor', 'Vegetable', 49.00, 'Quick-growing crunchy roots for salads and parathas.', '', 30),
+('Spinach', 'outdoor', 'Vegetable', 59.00, 'Nutritious leafy greens for saag and smoothies.', '', 35),
+('Okra Lady Finger', 'outdoor', 'Vegetable', 59.00, 'Tender pods for bhindi curry, loves hot weather.', '', 30),
+('Onion', 'outdoor', 'Vegetable', 49.00, 'Fresh spring onions and bulbs for every kitchen.', '', 30),
+('Potato', 'outdoor', 'Vegetable', 59.00, 'Easy-to-grow spuds in a sack or raised bed.', '', 25),
+-- ---------- Outdoor: Fruit Trees ----------
+('Mango Tree', 'outdoor', 'Fruit Tree', 1499.00, 'Homegrown sweet mangoes after a few happy seasons.', '', 8),
+('Guava Tree', 'outdoor', 'Fruit Tree', 999.00, 'Fragrant tropical fruit tree, compact and productive.', '', 10),
+('Lemon Tree', 'outdoor', 'Fruit Tree', 1199.00, 'Fresh lemons for drinks, pickles and cooking.', '', 10),
+('Orange Tree', 'outdoor', 'Fruit Tree', 1399.00, 'Sweet citrus fruit on a lush green tree.', '', 8),
+('Pomegranate', 'outdoor', 'Fruit Tree', 1099.00, 'Jewelled ruby fruit, thrives in warm climates.', '', 10),
+('Papaya', 'outdoor', 'Fruit Tree', 699.00, 'Fast-growing tree loaded with sweet tropical fruit.', '', 12),
+('Banana Plant', 'outdoor', 'Fruit', 899.00, 'Broad lush leaves and a crop of sweet bananas.', '', 10),
+('Sapodilla Chikoo', 'outdoor', 'Fruit Tree', 1299.00, 'Brown sugary fruit, a childhood favourite.', '', 8),
+('Custard Apple', 'outdoor', 'Fruit Tree', 999.00, 'Creamy sweet fruit with a honeyed flavour.', '', 8),
+('Grape Vine', 'outdoor', 'Fruit', 599.00, 'Climbing vine bearing juicy bunches of grapes.', '', 10),
+-- ---------- Outdoor: Trees ----------
+('Neem Tree', 'outdoor', 'Tree', 899.00, 'Medicinal shade tree, valuable for pest control.', '', 12),
+('Ashoka Tree', 'outdoor', 'Tree', 749.00, 'Elegant evergreen with cascading glossy leaves.', '', 12);

@@ -16,6 +16,7 @@ function setAuth(token) {
     panelView.style.display = "block";
     loadProducts();
     loadOrders();
+    loadReviews();
   } else {
     localStorage.removeItem("plant_shop_admin_token");
     loginView.style.display = "block";
@@ -178,6 +179,8 @@ async function changeOrderStatus(orderId, selectEl) {
     const result = await API.adminUpdateOrderStatus(adminToken, orderId, newStatus);
     if (result.success) {
       showToast(`Order #${orderId} status updated to ${newStatus}`);
+      // Reload so the order moves to the correct section (active vs completed)
+      loadOrders();
     } else {
       alert(result.error || "Could not update order status.");
       // Revert dropdown to reflect the saved status
@@ -189,11 +192,14 @@ async function changeOrderStatus(orderId, selectEl) {
   }
 }
 
-async function loadOrders() {
-  const result = await API.adminGetOrders(adminToken);
-  if (result.error) { setAuth(""); return; }
-  const orders = result.orders || [];
-  document.getElementById("orders-table-container").innerHTML = orders.length
+const ACTIVE_STATUSES = ["pending", "processing", "shipped"];
+const COMPLETED_STATUSES = ["delivered", "cancelled"];
+
+/** Render an orders table (or an empty state) into a container. */
+function renderOrdersTable(orders, containerId, emptyMessage) {
+  const container = document.getElementById(containerId);
+  if (!container) return;
+  container.innerHTML = orders.length
     ? `<table class="admin-table">
         <thead>
           <tr><th>Order ID</th><th>Customer</th><th>Phone</th><th>Items</th><th>Total</th><th>Method</th><th>Payment</th><th>Order Status</th><th>Date</th></tr>
@@ -224,7 +230,62 @@ async function loadOrders() {
           }).join("")}
         </tbody>
       </table>`
-    : `<div class="empty"><h2>No orders yet</h2></div>`;
+    : `<div class="empty"><h2>${emptyMessage}</h2></div>`;
+}
+
+async function loadOrders() {
+  const result = await API.adminGetOrders(adminToken);
+  if (result.error) { setAuth(""); return; }
+  const orders = result.orders || [];
+  // Active orders go in the Orders tab; delivered/cancelled go in Completed.
+  renderOrdersTable(
+    orders.filter((o) => ACTIVE_STATUSES.includes(o.order_status)),
+    "orders-table-container",
+    "No active orders"
+  );
+  renderOrdersTable(
+    orders.filter((o) => COMPLETED_STATUSES.includes(o.order_status)),
+    "completed-table-container",
+    "No completed orders"
+  );
+}
+
+// ---------- Reviews ----------
+async function loadReviews() {
+  const result = await API.adminGetReviews(adminToken);
+  if (result.error) { setAuth(""); return; }
+  const reviews = result.reviews || [];
+  document.getElementById("reviews-table-container").innerHTML = reviews.length
+    ? `<table class="admin-table">
+        <thead>
+          <tr><th>ID</th><th>Product</th><th>User</th><th>Rating</th><th>Comment</th><th>Date</th><th>Actions</th></tr>
+        </thead>
+        <tbody>
+          ${reviews.map((r) => `
+            <tr>
+              <td>#${r.id}</td>
+              <td>${escapeHtml(r.product_name)}</td>
+              <td>${escapeHtml(r.user_name)}<br/><span style="font-size:0.7rem;color:var(--text-light)">${escapeHtml(r.user_email || "")}</span></td>
+              <td>${renderStars(r.rating)}</td>
+              <td style="max-width:320px">${r.comment ? escapeHtml(r.comment) : "-"}</td>
+              <td style="white-space:nowrap">${new Date(r.created_at).toLocaleString()}</td>
+              <td><button class="btn btn-danger" onclick="deleteReview(${r.id})">Delete</button></td>
+            </tr>
+          `).join("")}
+        </tbody>
+      </table>`
+    : `<div class="empty"><h2>No reviews yet</h2><p>Customer ratings and comments will appear here.</p></div>`;
+}
+
+async function deleteReview(id) {
+  if (!confirm("Delete this review?")) return;
+  const result = await API.adminDeleteReview(adminToken, id);
+  if (result.success) {
+    loadReviews();
+    showToast("Review deleted");
+  } else {
+    alert(result.error || "Could not delete review.");
+  }
 }
 
 // ---------- UPI Settings ----------

@@ -44,6 +44,8 @@
     <div class="admin-tabs">
       <button class="active" data-tab="products">Products</button>
       <button data-tab="orders">Orders</button>
+      <button data-tab="completed">Completed Orders</button>
+      <button data-tab="reviews">Reviews</button>
       <button data-tab="settings">Payment Settings</button>
     </div>
 
@@ -57,7 +59,19 @@
 
     <!-- Orders tab -->
     <div class="admin-tab" id="tab-orders">
+      <div style="margin-bottom:0.8rem;font-size:0.9rem;color:var(--text-light)">Active orders (pending, processing, shipped)</div>
       <div id="orders-table-container"></div>
+    </div>
+
+    <!-- Completed Orders tab (delivered / cancelled) -->
+    <div class="admin-tab" id="tab-completed">
+      <div style="margin-bottom:0.8rem;font-size:0.9rem;color:var(--text-light)">Delivered and cancelled orders</div>
+      <div id="completed-table-container"></div>
+    </div>
+
+    <!-- Reviews tab -->
+    <div class="admin-tab" id="tab-reviews">
+      <div id="reviews-table-container"></div>
     </div>
 
     <!-- Settings tab -->
@@ -123,6 +137,7 @@
   </div>
 
   <script src="js/api.js"></script>
+  <script src="js/auth.js"></script>
   <script src="js/main.js"></script>
   <script src="js/qrcode.js"></script>
   <script src="js/admin.js"></script>

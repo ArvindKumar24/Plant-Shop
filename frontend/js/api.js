@@ -69,6 +69,35 @@ const API = {
     return res.json();
   },
 
+  // ---------- Product Reviews ----------
+  // GET reviews for a product (public)
+  getProductReviews: async (id) => {
+    const res = await fetch(`/api/products/${id}/reviews`);
+    return res.json();
+  },
+
+  // POST submit/edit the caller's review for a product (requires login)
+  submitProductReview: async (id, token, data) => {
+    const res = await fetch(`/api/products/${id}/reviews`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
+      body: JSON.stringify(data),
+    });
+    return res.json();
+  },
+
+  // DELETE the caller's own review for a product (requires login)
+  deleteProductReview: async (id, token) => {
+    const res = await fetch(`/api/products/${id}/reviews`, {
+      method: "DELETE",
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    return res.json();
+  },
+
   // ---------- Admin ----------
   adminLogin: async (username, password) => {
     const res = await fetch("/api/admin/login", {
@@ -130,6 +159,21 @@ const API = {
     });
     return res.json();
   },
+
+  adminGetReviews: async (token) => {
+    const res = await fetch("/api/admin/reviews", {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    return res.json();
+  },
+
+  adminDeleteReview: async (token, id) => {
+    const res = await fetch(`/api/admin/reviews/${id}`, {
+      method: "DELETE",
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    return res.json();
+  },
 };
 
 /** Format a number as currency. */
@@ -140,6 +184,20 @@ function formatPrice(price) {
 /** Build product image URL with fallback placeholder. */
 function productImage(product) {
   return product.image_url || "https://via.placeholder.com/400x300/4caf50/ffffff?text=Plant";
+}
+
+/**
+ * Render a read-only star rating (★ filled/empty) for a 1-5 value.
+ * Ratings are rounded to the nearest whole star for display.
+ */
+function renderStars(rating) {
+  const r = Number(rating) || 0;
+  const filled = Math.max(0, Math.min(5, Math.round(r)));
+  let html = "";
+  for (let i = 1; i <= 5; i++) {
+    html += `<span class="star${i <= filled ? " filled" : ""}">★</span>`;
+  }
+  return `<span class="stars">${html}</span>`;
 }
 
 /** Show a toast notification. */

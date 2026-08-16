@@ -146,41 +146,127 @@ def handle_products_list():
     search = request.args.get("search")
     if search:
         term = f"%{search}%"
-        conditions.append("(name LIKE %s OR plant_type LIKE %s OR description LIKE %s)")
+        conditions.append("(p.name LIKE %s OR p.plant_type LIKE %s OR p.description LIKE %s)")
         values.extend([term, term, term])
 
     category = request.args.get("category")
     if category:
-        conditions.append("category = %s")
+        conditions.append("p.category = %s")
         values.append(category)
 
     plant_type = request.args.get("plant_type")
     if plant_type:
-        conditions.append("plant_type = %s")
+        conditions.append("p.plant_type = %s")
         values.append(plant_type)
 
     min_price = request.args.get("min_price")
     if min_price:
-        conditions.append("price >= %s")
+        conditions.append("p.price >= %s")
         values.append(float(min_price))
 
     max_price = request.args.get("max_price")
     if max_price:
-        conditions.append("price <= %s")
+        conditions.append("p.price <= %s")
         values.append(float(max_price))
 
     where = "WHERE " + " AND ".join(conditions) if conditions else ""
-    sql = f"SELECT * FROM products {where} ORDER BY name"
+    sql = f"""SELECT p.*,
+              COALESCE(ROUND(AVG(r.rating), 1), 0) AS avg_rating,
+              COUNT(r.id) AS rating_count
+           FROM products p
+           LEFT JOIN reviews r ON r.product_id = p.id
+           {where}
+           GROUP BY p.id
+           ORDER BY p.name"""
     products = query(sql, values)
     return _json({"products": products})
 
 
 @app.route("/api/products/<int:pid>", methods=["GET"])
 def handle_product_detail(pid):
-    product = query("SELECT * FROM products WHERE id = %s", (pid,), fetchone=True)
+    product = query(
+        """SELECT p.*,
+              COALESCE(ROUND(AVG(r.rating), 1), 0) AS avg_rating,
+              COUNT(r.id) AS rating_count
+           FROM products p
+           LEFT JOIN reviews r ON r.product_id = p.id
+           WHERE p.id = %s
+           GROUP BY p.id""",
+        (pid,),
+        fetchone=True,
+    )
     if not product:
         return _json({"error": "Product not found"}, 404)
     return _json({"product": product})
+
+
+@app.route("/api/products/<int:pid>/reviews", methods=["GET"])
+def handle_product_reviews(pid):
+    """GET /api/products/<id>/reviews - list public reviews for a product."""
+    product = query("SELECT id FROM products WHERE id = %s", (pid,), fetchone=True)
+    if not product:
+        return _json({"error": "Product not found"}, 404)
+    reviews = query(
+        """SELECT r.id, r.rating, r.comment, r.created_at, r.user_id,
+                  u.name AS user_name
+           FROM reviews r
+           JOIN users u ON u.id = r.user_id
+           WHERE r.product_id = %s
+           ORDER BY r.created_at DESC""",
+        (pid,),
+    )
+    return _json({"reviews": reviews})
+
+
+@app.route("/api/products/<int:pid>/reviews", methods=["POST"])
+def handle_submit_review(pid):
+    """POST /api/products/<id>/reviews - submit or edit the caller's review."""
+    user = _check_user()
+    if not user:
+        return _json({"error": "Please log in to review a product"}, 401)
+    product = query("SELECT id FROM products WHERE id = %s", (pid,), fetchone=True)
+    if not product:
+        return _json({"error": "Product not found"}, 404)
+
+    data = request.get_json(silent=True) or {}
+    try:
+        rating = int(data.get("rating", 0))
+    except (TypeError, ValueError):
+        rating = 0
+    comment = str(data.get("comment", "")).strip()
+
+    if rating not in range(1, 6):
+        return _json({"error": "Rating must be between 1 and 5"}, 400)
+    if len(comment) > 1000:
+        return _json({"error": "Comment must be 1000 characters or fewer"}, 400)
+
+    # One review per user per product: re-submitting updates the existing row.
+    review_id = execute(
+        """INSERT INTO reviews (product_id, user_id, rating, comment)
+           VALUES (%s, %s, %s, %s)
+           ON CONFLICT (product_id, user_id)
+           DO UPDATE SET rating = EXCLUDED.rating,
+                         comment = EXCLUDED.comment,
+                         created_at = now()""",
+        (pid, user["id"], rating, comment or None),
+        get_id=True,
+    )
+    return _json({"success": True, "id": review_id})
+
+
+@app.route("/api/products/<int:pid>/reviews", methods=["DELETE"])
+def handle_delete_own_review(pid):
+    """DELETE /api/products/<id>/reviews - delete the caller's own review."""
+    user = _check_user()
+    if not user:
+        return _json({"error": "Please log in"}, 401)
+    rowcount = execute(
+        "DELETE FROM reviews WHERE product_id = %s AND user_id = %s",
+        (pid, user["id"]),
+    )
+    if rowcount == 0:
+        return _json({"error": "Review not found"}, 404)
+    return _json({"success": True, "id": pid})
 
 
 @app.route("/api/auth/register", methods=["POST"])
@@ -444,6 +530,34 @@ def handle_admin_update_order(oid):
         (order_status, oid),
     )
     return _json({"success": True, "id": oid, "order_status": order_status})
+
+
+@app.route("/api/admin/reviews", methods=["GET"])
+def handle_admin_reviews():
+    """GET /api/admin/reviews - list all reviews (moderation)."""
+    if not _check_admin():
+        return _json({"error": "Unauthorized"}, 401)
+    reviews = query(
+        """SELECT r.id, r.rating, r.comment, r.created_at,
+                  r.product_id, p.name AS product_name,
+                  u.name AS user_name, u.email AS user_email
+           FROM reviews r
+           JOIN products p ON p.id = r.product_id
+           JOIN users u ON u.id = r.user_id
+           ORDER BY r.created_at DESC"""
+    )
+    return _json({"reviews": reviews})
+
+
+@app.route("/api/admin/reviews/<int:rid>", methods=["DELETE"])
+def handle_admin_delete_review(rid):
+    """DELETE /api/admin/reviews/<id> - remove a review (moderation)."""
+    if not _check_admin():
+        return _json({"error": "Unauthorized"}, 401)
+    rowcount = execute("DELETE FROM reviews WHERE id = %s", (rid,))
+    if rowcount == 0:
+        return _json({"error": "Review not found"}, 404)
+    return _json({"success": True, "id": rid})
 
 
 # ---------------------------------------------------------------------------

@@ -80,7 +80,16 @@ const p = data.product;
               <a href="products.html" class="btn btn-outline btn-block" style="margin-top:0.8rem">Continue Shopping</a>
             </div>
           </div>
+          <div class="reviews-section">
+            <h2>Ratings & Reviews</h2>
+            <div id="reviews-summary"></div>
+            <div id="review-form-container"></div>
+            <div id="reviews-list"></div>
+          </div>
         `;
+        renderReviewSummary(p);
+        loadReviews(p.id);
+        renderReviewForm(p.id);
       } catch (e) {
         container.innerHTML = `<div class="empty"><h2>Could not load product</h2><p>Please check the server and database.</p></div>`;
       }
@@ -92,6 +101,137 @@ const p = data.product;
       const max = parseInt(input.max, 10) || 99;
       const next = Math.min(max, Math.max(1, val + delta));
       input.value = next;
+    }
+
+    // ---------- Ratings & Reviews ----------
+
+    /** Render the average rating summary block. */
+    function renderReviewSummary(p) {
+      const el = document.getElementById("reviews-summary");
+      if (!el) return;
+      const count = p.rating_count || 0;
+      const avg = Number(p.avg_rating) || 0;
+      el.innerHTML = `
+        <div class="review-summary">
+          <div class="review-summary-rating">${renderStars(avg)}</div>
+          <div class="review-summary-text">
+            <strong>${avg > 0 ? avg.toFixed(1) : "No ratings yet"}</strong>
+            <span>${avg > 0 ? "based on " + count + " review" + (count === 1 ? "" : "s") : "Be the first to review"}</span>
+          </div>
+        </div>`;
+    }
+
+    /** Render the list of reviews for the product. */
+    async function loadReviews(pid) {
+      const el = document.getElementById("reviews-list");
+      if (!el) return;
+      try {
+        const data = await API.getProductReviews(pid);
+        const reviews = data.reviews || [];
+        const user = getCurrentUser();
+        if (!reviews.length) {
+          el.innerHTML = `<div class="empty"><p>No reviews yet. Share your experience to help other plant lovers!</p></div>`;
+          return;
+        }
+        el.innerHTML = reviews.map((r) => {
+          const isOwn = user && user.id === r.user_id;
+          return `
+            <div class="review-card">
+              <div class="review-head">
+                <strong>${escapeHtml(r.user_name)}</strong>
+                ${renderStars(r.rating)}
+                ${isOwn ? '<span class="badge" style="background:#e8f5e9;color:#2e7d32">You</span>' : ""}
+                <span class="review-date">${new Date(r.created_at).toLocaleDateString()}</span>
+              </div>
+              ${r.comment ? `<p class="review-comment">${escapeHtml(r.comment)}</p>` : ""}
+              ${isOwn ? `<button class="btn btn-danger btn-sm" style="margin-top:0.5rem" onclick="deleteOwnReview(${pid}, ${r.id})">Delete my review</button>` : ""}
+            </div>`;
+        }).join("");
+      } catch (e) {
+        el.innerHTML = `<div class="empty"><p>Could not load reviews.</p></div>`;
+      }
+    }
+
+    /** Render the review submission form (or a login prompt for guests). */
+    function renderReviewForm(pid) {
+      const el = document.getElementById("review-form-container");
+      if (!el) return;
+      if (!isLoggedIn()) {
+        el.innerHTML = `<p class="review-login">Want to share your experience? <a href="login.html?redirect=${encodeURIComponent("product.html?id=" + pid)}">Log in</a> to rate and review this plant.</p>`;
+        return;
+      }
+      API.getProductReviews(pid).then((data) => {
+        const user = getCurrentUser();
+        const own = (data.reviews || []).find((r) => user && r.user_id === user.id);
+        const rating = own ? own.rating : 0;
+        el.innerHTML = `
+          <div class="review-form">
+            <h3>${own ? "Edit your review" : "Write a review"}</h3>
+            <div class="rating-input">
+              ${[1, 2, 3, 4, 5].map((n) => `<span class="star-pick${n <= rating ? " filled" : ""}" onclick="pickRating(${n})">★</span>`).join("")}
+              <span class="rating-label" id="rating-label">${own ? rating + " star" + (rating > 1 ? "s" : "") : "Click a star to rate"}</span>
+            </div>
+            <input type="hidden" id="selected-rating" value="${rating}" />
+            <div class="form-group">
+              <textarea id="review-comment" placeholder="Share your experience with this plant...">${own && own.comment ? escapeHtml(own.comment) : ""}</textarea>
+            </div>
+            <div class="modal-actions">
+              <button class="btn" onclick="submitReview(${pid})">${own ? "Update Review" : "Submit Review"}</button>
+            </div>
+          </div>`;
+      });
+    }
+
+    /** Highlight stars as the user picks a rating. */
+    function pickRating(val) {
+      const hidden = document.getElementById("selected-rating");
+      if (hidden) hidden.value = val;
+      document.querySelectorAll(".star-pick").forEach((s, i) => {
+        s.classList.toggle("filled", i < val);
+      });
+      const label = document.getElementById("rating-label");
+      if (label) label.textContent = val + " star" + (val > 1 ? "s" : "");
+    }
+
+    /** Submit or update the user's review, then refresh the section. */
+    async function submitReview(pid) {
+      const rating = parseInt(document.getElementById("selected-rating").value, 10);
+      const comment = document.getElementById("review-comment").value.trim();
+      if (!rating || rating < 1 || rating > 5) {
+        showToast("Please select a star rating");
+        return;
+      }
+      const result = await API.submitProductReview(pid, getAuthToken(), { rating, comment });
+      if (result.success) {
+        showToast("Review submitted");
+        renderReviewForm(pid);
+        loadReviews(pid);
+        refreshRatingSummary(pid);
+      } else {
+        showToast(result.error || "Could not submit review");
+      }
+    }
+
+    /** Delete the user's own review, then refresh the section. */
+    async function deleteOwnReview(pid) {
+      if (!confirm("Delete your review for this product?")) return;
+      const result = await API.deleteProductReview(pid, getAuthToken());
+      if (result.success) {
+        showToast("Review deleted");
+        renderReviewForm(pid);
+        loadReviews(pid);
+        refreshRatingSummary(pid);
+      } else {
+        showToast(result.error || "Could not delete review");
+      }
+    }
+
+    /** Re-fetch the product to refresh the average rating after a change. */
+    async function refreshRatingSummary(pid) {
+      try {
+        const data = await API.getProduct(pid);
+        if (data.product) renderReviewSummary(data.product);
+      } catch (e) {}
     }
   </script>
 </body>

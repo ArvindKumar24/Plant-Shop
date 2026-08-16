@@ -59,6 +59,9 @@ const data = await API.getProducts();
               <span class="badge ${p.category}">${p.category}</span>
               <h3><a href="product.html?id=${p.id}">${p.name}</a></h3>
               <div class="price">${formatPrice(p.price)}</div>
+              <div class="card-rating">${(p.rating_count || 0) > 0
+                ? `${renderStars(p.avg_rating)} <span class="rating-count">${p.rating_count}</span>`
+                : `<span class="rating-count">No ratings yet</span>`}</div>
               <p class="desc">${p.description || ''}</p>
               <div class="product-actions">
 <button class="btn" onclick="addToCartById(${p.id}, 1)">Add to Cart</button>

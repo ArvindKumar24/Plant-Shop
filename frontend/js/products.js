@@ -21,6 +21,9 @@ function renderProducts(products) {
         <span class="badge ${p.category}">${p.category}</span>
         <h3><a href="product.html?id=${p.id}">${p.name}</a></h3>
         <div class="price">${formatPrice(p.price)}</div>
+        <div class="card-rating">${(p.rating_count || 0) > 0
+          ? `${renderStars(p.avg_rating)} <span class="rating-count">${p.rating_count}</span>`
+          : `<span class="rating-count">No ratings yet</span>`}</div>
         <p class="desc">${p.description || ''}</p>
 <div class="product-actions">
           <button class="btn" ${p.stock <= 0 ? 'disabled style="opacity:0.5;cursor:not-allowed"' : ""} onclick="addToCartById(${p.id}, 1)">${p.stock <= 0 ? "Out of Stock" : "Add to Cart"}</button>

@@ -2181,3 +2181,160 @@ gap: 1rem;
     align-items: flex-start;
   }
 }
+
+/* ---------- Ratings & Reviews ---------- */
+.stars {
+  display: inline-flex;
+  align-items: center;
+  gap: 1px;
+  font-size: 1rem;
+  line-height: 1;
+}
+
+.star {
+  color: #cfd8dc;
+}
+
+.star.filled {
+  color: #f9a825;
+}
+
+.rating-count {
+  font-size: 0.75rem;
+  color: var(--text-light);
+}
+
+.card-rating {
+  display: flex;
+  align-items: center;
+  gap: 0.3rem;
+  margin-bottom: 0.4rem;
+}
+
+.reviews-section {
+  margin-top: 2rem;
+}
+
+.reviews-section h2 {
+  color: var(--primary-dark);
+  margin-bottom: 1rem;
+  font-size: 1.3rem;
+}
+
+.review-summary {
+  display: flex;
+  align-items: center;
+  gap: 0.8rem;
+  background: var(--card);
+  border-radius: var(--radius);
+  padding: 1rem 1.2rem;
+  box-shadow: var(--shadow);
+  margin-bottom: 1.2rem;
+}
+
+.review-summary-rating .stars {
+  font-size: 1.5rem;
+}
+
+.review-summary-text strong {
+  font-size: 1.3rem;
+  color: var(--primary-dark);
+  display: block;
+  line-height: 1.2;
+}
+
+.review-summary-text span {
+  font-size: 0.8rem;
+  color: var(--text-light);
+}
+
+.review-card {
+  background: var(--card);
+  border-radius: var(--radius);
+  padding: 1rem;
+  box-shadow: var(--shadow);
+  margin-bottom: 0.8rem;
+}
+
+.review-head {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  flex-wrap: wrap;
+  margin-bottom: 0.4rem;
+}
+
+.review-head strong {
+  font-size: 0.95rem;
+}
+
+.review-date {
+  font-size: 0.75rem;
+  color: var(--text-light);
+  margin-left: auto;
+}
+
+.review-comment {
+  font-size: 0.9rem;
+  color: var(--text);
+}
+
+.review-card .btn-sm {
+  padding: 0.25rem 0.5rem;
+  font-size: 0.7rem;
+}
+
+.review-login {
+  color: var(--text-light);
+  font-size: 0.9rem;
+  margin: 1rem 0;
+}
+
+.review-login a {
+  color: var(--primary);
+  font-weight: 600;
+}
+
+.review-form {
+  background: var(--card);
+  border-radius: var(--radius);
+  padding: 1.2rem;
+  box-shadow: var(--shadow);
+  margin: 1.2rem 0;
+}
+
+.review-form h3 {
+  color: var(--primary-dark);
+  font-size: 1.1rem;
+  margin-bottom: 0.8rem;
+}
+
+.rating-input {
+  display: flex;
+  align-items: center;
+  gap: 0.2rem;
+  margin-bottom: 0.8rem;
+}
+
+.star-pick {
+  font-size: 1.6rem;
+  color: #cfd8dc;
+  cursor: pointer;
+  user-select: none;
+  transition: color 0.15s, transform 0.1s;
+  line-height: 1;
+}
+
+.star-pick:hover {
+  transform: scale(1.15);
+}
+
+.star-pick.filled {
+  color: #f9a825;
+}
+
+.rating-label {
+  margin-left: 0.5rem;
+  font-size: 0.85rem;
+  color: var(--text-light);
+}
