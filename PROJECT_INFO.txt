@@ -1,0 +1,175 @@
+==========================================================
+  GREENLEAF PLANTS - Project Information
+==========================================================
+
+Project Name   : GreenLeaf Plants
+Type           : E-commerce Website (Indoor & Outdoor Plants)
+Architecture   : Multi-page application (MPA), no frontend framework
+Deployment     : Vercel (serverless)
+
+==========================================================
+  TECH STACK
+==========================================================
+
+  Frontend  : HTML, CSS, JavaScript (vanilla, no frameworks)
+  Backend   : Python Flask (REST API + static file serving)
+  Database  : PostgreSQL hosted on Supabase (via psycopg2)
+  Hosting   : Vercel (serverless WSGI via api/index.py)
+
+==========================================================
+  CUSTOMER-FACING PAGES
+==========================================================
+
+  index.html        Home page — hero banner + 4 featured products
+  products.html     Product listing — browse, search, filter by
+                    category/price/plant type
+  product.html      Product detail — image, price, description,
+                    average rating, customer reviews
+  cart.html         Shopping cart — add/remove/update quantities
+                    (requires login)
+  checkout.html     Checkout — Cash on Delivery, UPI QR code,
+                    or Card payment (simulated)
+  login.html        Customer login (email + password)
+  register.html     Customer registration
+  orders.html       My Orders — order history + status tracker
+
+==========================================================
+  ADMIN PAGES
+==========================================================
+
+  admin.html        Admin dashboard with tabs for:
+                    - Product management (add/edit/delete)
+                    - Order management (view/update status)
+                    - Review moderation (view/delete)
+                    - Payment settings (UPI QR code config)
+                    Default credentials: admin / admin123
+
+==========================================================
+  KEY FEATURES
+==========================================================
+
+  - Product search and multi-filter (category, price, type)
+  - Ratings & reviews (1-5 star rating + text comment)
+  - Cart persistence via browser localStorage
+  - Three payment methods: COD, UPI (QR code), Card (simulated)
+  - Order status tracking: pending > processing > shipped > delivered
+  - Responsive design with 3 breakpoints (768px, 600px, 400px)
+  - Admin panel for full product, order, and review management
+  - Auth via sessionStorage (session ends on tab close)
+
+==========================================================
+  DATABASE (PostgreSQL / Supabase)
+==========================================================
+
+  Tables:
+    users          - Customer accounts (id, name, email, password, created_at)
+    products       - Plant catalog (id, name, description, price, image_url,
+                     stock, category, created_at)
+    reviews        - Customer reviews (id, product_id, user_id, rating,
+                     comment, created_at) — one review per user per product
+    orders         - Customer orders (id, user_id, customer_name, phone,
+                     email, address, city, state, pincode, total_amount,
+                     status, order_date)
+    order_items    - Individual items in an order (id, order_id, product_id,
+                     quantity, price)
+    admin_users    - Admin accounts
+
+  Schema file: database/schema.sql
+  Seed data:   database/seed_100_products.sql
+
+==========================================================
+  REST API ENDPOINTS
+==========================================================
+
+  Public:
+    GET  /api/products              List/search/filter products
+    GET  /api/products/:id          Single product detail
+    GET  /api/products/:id/reviews  List reviews for a product
+
+  Auth Required (customer):
+    POST /api/auth/register         Create account
+    POST /api/auth/login            Login (returns token)
+    GET  /api/auth/me               Get current user
+    POST /api/products/:id/reviews  Submit or edit a review
+    DELETE /api/products/:id/reviews  Delete own review
+    POST /api/orders               Place an order
+    GET  /api/orders               View own order history
+
+  Admin:
+    POST /api/admin/login           Admin login
+    GET  /api/admin/products        List all products
+    POST /api/admin/products        Add a product
+    PUT  /api/admin/products/:id    Update a product
+    DELETE /api/admin/products/:id  Delete a product
+    GET  /api/admin/orders          List all orders
+    PUT  /api/admin/orders/:id      Update order status
+    GET  /api/admin/reviews         List all reviews
+    DELETE /api/admin/reviews/:id   Delete a review
+
+==========================================================
+  PROJECT STRUCTURE
+==========================================================
+
+  Plant-Shop1/
+  |-- api/
+  |   +-- index.py                  Vercel serverless entry point
+  |-- backend/
+  |   |-- app.py                    Flask application (REST API)
+  |   |-- config.py                 Configuration (env vars, paths)
+  |   |-- database.py               DB connection pool + query helpers
+  |   |-- server.py                 Legacy standalone HTTP server
+  |   +-- requirements.txt          Python dependencies
+  |-- database/
+  |   |-- schema.sql                Full PostgreSQL schema
+  |   +-- seed_100_products.sql     Seed data (100 products)
+  |-- frontend/
+  |   |-- index.html                Home
+  |   |-- products.html             Product listing
+  |   |-- product.html              Product detail
+  |   |-- cart.html                 Shopping cart
+  |   |-- checkout.html             Checkout + payment
+  |   |-- orders.html               My Orders
+  |   |-- login.html                Customer login
+  |   |-- register.html             Customer registration
+  |   |-- admin.html                Admin dashboard
+  |   |-- css/
+  |   |   +-- styles.css            Single CSS file (all styles)
+  |   +-- js/
+  |       |-- api.js                API fetch helpers + utilities
+  |       |-- main.js               Shared init (cart badge, auth nav)
+  |       |-- auth.js               Client-side auth (sessionStorage)
+  |       |-- cart.js               Cart management (localStorage)
+  |       |-- products.js           Product listing + filters
+  |       |-- checkout.js           Checkout + payment logic
+  |       |-- orders.js             Customer order history
+  |       |-- login.js              Login form handler
+  |       |-- register.js           Registration form handler
+  |       +-- admin.js              Admin dashboard logic
+  |-- .env.example                  Environment variable template
+  |-- vercel.json                   Vercel routing config
+  |-- requirements.txt              Root Python dependencies
+  +-- README.md                     Full documentation
+
+==========================================================
+  SECURITY
+==========================================================
+
+  - Parameterized SQL queries (psycopg2) prevent SQL injection
+  - Passwords stored as SHA-256 hashes
+  - Admin API routes require Base64 token authentication
+  - Basic input validation on both backend and frontend
+  - Browser never communicates with the database directly
+
+==========================================================
+  SETUP
+==========================================================
+
+  1. Create a Supabase project and run database/schema.sql
+  2. Copy .env.example to .env and set DATABASE_URL
+  3. Install Python dependencies: pip install -r requirements.txt
+  4. Run locally: cd backend && python -m flask --app app run
+  5. Open http://127.0.0.1:5000
+
+  For full deployment guide see: SETUP-SUPABASE-VERCEL.txt
+
+==========================================================

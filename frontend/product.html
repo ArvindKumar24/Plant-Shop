@@ -10,7 +10,10 @@
   <header class="site-header">
     <div class="header-inner">
       <a href="index.html" class="logo"><span>🌿</span> GreenLeaf Plants</a>
-      <nav class="nav-links">
+      <button class="hamburger" id="hamburger" aria-label="Toggle menu">
+        <span></span><span></span><span></span>
+      </button>
+      <nav class="nav-links" id="nav-links">
         <a href="index.html">Home</a>
         <a href="products.html?category=indoor">Indoor</a>
         <a href="products.html?category=outdoor">Outdoor</a>
@@ -19,6 +22,7 @@
 <a href="cart.html" class="cart-link">🛒<span class="cart-count" id="cart-count">0</span></a>
         <span id="auth-nav"></span>
       </nav>
+      <div class="nav-overlay" id="nav-overlay"></div>
     </div>
   </header>
 

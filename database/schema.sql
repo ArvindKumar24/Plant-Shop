@@ -26,11 +26,12 @@ DROP TABLE IF EXISTS users CASCADE;
 -- ============================================================
 
 CREATE TABLE users (
-    id          BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
-    name        VARCHAR(150) NOT NULL,
-    email       VARCHAR(255) NOT NULL UNIQUE,
-    password    VARCHAR(255) NOT NULL,
-    created_at  TIMESTAMPTZ NOT NULL DEFAULT now()
+    id            BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+    name          VARCHAR(150) NOT NULL,
+    email         VARCHAR(255) NOT NULL UNIQUE,
+    phone         VARCHAR(30),
+    password_hash VARCHAR(255) NOT NULL,
+    created_at    TIMESTAMPTZ NOT NULL DEFAULT now()
 );
 
 
@@ -46,6 +47,7 @@ CREATE TABLE products (
     image_url   TEXT,
     stock       INT NOT NULL DEFAULT 0 CHECK (stock >= 0),
     category    VARCHAR(100),
+    plant_type  VARCHAR(100) DEFAULT 'general',
     created_at  TIMESTAMPTZ NOT NULL DEFAULT now()
 );
 
@@ -136,7 +138,9 @@ CREATE TABLE orders (
     pincode         VARCHAR(20),
     total_amount    NUMERIC(10,2) NOT NULL DEFAULT 0
                     CHECK (total_amount >= 0),
-    status          VARCHAR(50) NOT NULL DEFAULT 'pending',
+    payment_method  VARCHAR(50),
+    payment_status  VARCHAR(50) DEFAULT 'pending',
+    order_status    VARCHAR(50) NOT NULL DEFAULT 'pending',
     order_date      TIMESTAMPTZ NOT NULL DEFAULT now()
 );
 
@@ -244,7 +248,7 @@ VALUES (
 -- OPTIONAL SAMPLE USER
 -- ============================================================
 
--- INSERT INTO users (name, email, password)
+-- INSERT INTO users (name, email, password_hash)
 -- VALUES (
 --     'Test User',
 --     'test@example.com',

@@ -40,4 +40,4 @@ FRONTEND_DIR = os.path.join(
 # Get it from Supabase Dashboard -> Project Settings -> Database:
 #   - Direct connection (local dev):   postgresql://postgres.<ref>:<PASSWORD>@aws-0-<REGION>.pooler.supabase.com:5432/postgres?sslmode=require
 #   - Transaction pooler (serverless): postgresql://postgres.<ref>:<PASSWORD>@aws-0-<REGION>.pooler.supabase.com:6543/postgres?sslmode=require
-DATABASE_URL = os.environ.get("DATABASE_URL", "")
+DATABASE_URL = os.environ.get("DATABASE_URL", "postgresql://postgres.ahckojeyxfoaakxpqqvm:PlantSHop%40123@aws-0-ap-northeast-1.pooler.supabase.com:6543/postgres?sslmode=require")
