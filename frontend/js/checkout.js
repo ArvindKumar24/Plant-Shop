@@ -4,10 +4,24 @@
 
 // UPI payment details. The QR code is generated locally (see makeQrDataUrl)
 // using the vendored qrcode.js library, so it always renders without depending
-// on any external service.
-const UPI_ID = "greenleaf@upi";
-const UPI_NAME = "GreenLeaf Plants";
-const UPI_PAY_DATA = "upi://pay?pa=" + UPI_ID + "&pn=" + encodeURIComponent(UPI_NAME);
+// on any external service. The ID and payee name come from the admin-editable
+// site settings; these values are the fallback if they cannot be loaded.
+const DEFAULT_UPI_ID = "greenleaf@upi";
+const DEFAULT_UPI_NAME = "GreenLeaf Plants";
+
+/** Resolve the UPI id and payee name, falling back to the defaults. */
+function resolveUpi(settings) {
+  return {
+    id: (settings && settings.upi_id) || DEFAULT_UPI_ID,
+    name: (settings && settings.upi_name) || DEFAULT_UPI_NAME,
+  };
+}
+
+/** Build the UPI deep link from the given settings, falling back to defaults. */
+function upiPayData(settings) {
+  const upi = resolveUpi(settings);
+  return "upi://pay?pa=" + encodeURIComponent(upi.id) + "&pn=" + encodeURIComponent(upi.name);
+}
 
 /** Generate a UPI QR code as a data URL (blank if the library is unavailable). */
 function makeQrDataUrl(text, cellSize = 8, margin = 2) {
@@ -20,7 +34,7 @@ function makeQrDataUrl(text, cellSize = 8, margin = 2) {
 
 let selectedPayment = "cash";
 
-function renderCheckout() {
+async function renderCheckout() {
   // Checkout requires login
   if (!requireAuth()) return;
 
@@ -33,6 +47,15 @@ function renderCheckout() {
         <a href="products.html" class="btn">Shop Plants</a>
       </div>`;
     return;
+  }
+
+  // UPI details are admin-editable; keep the defaults if they cannot be loaded.
+  let upiSettings = null;
+  try {
+    const result = await API.getSettings();
+    if (!result.error) upiSettings = result.settings;
+  } catch (e) {
+    // fall through to the default UPI details
   }
 
   const user = getCurrentUser() || {};
@@ -76,9 +99,9 @@ function renderCheckout() {
               <label><input type="radio" name="payment" value="upi" ${selectedPayment === 'upi' ? 'checked' : ''} /> 📱 UPI Payment</label>
               <div class="sub">Scan the QR code to pay instantly.</div>
               <div class="upi-qr" id="upi-qr" style="${selectedPayment === 'upi' ? '' : 'display:none'}">
-                <img src="${makeQrDataUrl(UPI_PAY_DATA)}" alt="UPI QR Code" />
+                <img src="${makeQrDataUrl(upiPayData(upiSettings))}" alt="UPI QR Code" />
                 <p style="font-size:0.85rem;color:var(--text-light);margin-top:0.4rem">Scan with any UPI app (GPay, PhonePe, Paytm)</p>
-                <p style="font-size:0.85rem;color:var(--text-light);margin-top:0.4rem">Pay to: <strong>${UPI_ID}</strong></p>
+                <p style="font-size:0.85rem;color:var(--text-light);margin-top:0.4rem">Pay to: <strong>${escapeHtml(resolveUpi(upiSettings).id)}</strong></p>
               </div>
             </div>
             <div class="payment-option ${selectedPayment === 'card' ? 'selected' : ''}" data-method="card">

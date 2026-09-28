@@ -2106,3 +2106,139 @@ img {
   font-size: 0.85rem;
   color: var(--text-light);
 }
+
+/* ---------- Footer Links ---------- */
+.site-footer .footer-links {
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 1.2rem;
+  margin-bottom: 0.8rem;
+}
+
+.site-footer .footer-links a {
+  color: #fff;
+  font-weight: 600;
+  text-decoration: none;
+  border-bottom: 2px solid transparent;
+  padding-bottom: 2px;
+  transition: border-color 0.15s, opacity 0.15s;
+}
+
+.site-footer .footer-links a:hover,
+.site-footer .footer-links a:focus {
+  border-bottom-color: var(--accent);
+  opacity: 0.9;
+}
+
+.site-footer .footer-text {
+  margin: 0;
+}
+
+/* ---------- Content Pages (About / Contact) ---------- */
+.page-article {
+  max-width: 780px;
+  margin: 0 auto;
+  padding: 1rem 0;
+}
+
+.page-header {
+  color: var(--primary-dark);
+  margin-bottom: 1.2rem;
+  padding-bottom: 0.6rem;
+  border-bottom: 2px solid var(--border);
+}
+
+.page-content p {
+  margin-bottom: 1.1rem;
+  color: var(--text);
+}
+
+/* ---------- Contact Details Card ---------- */
+.contact-card {
+  margin-top: 2rem;
+  padding: 1.5rem;
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+}
+
+.contact-card h2 {
+  color: var(--primary-dark);
+  font-size: 1.2rem;
+  margin-bottom: 1rem;
+}
+
+.contact-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.8rem;
+}
+
+.contact-row {
+  display: flex;
+  gap: 0.8rem;
+  align-items: baseline;
+  font-size: 0.95rem;
+}
+
+.contact-label {
+  flex: 0 0 120px;
+  color: var(--text-light);
+  font-weight: 600;
+  font-size: 0.85rem;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+}
+
+.contact-value {
+  flex: 1;
+  color: var(--text);
+  overflow-wrap: break-word;
+}
+
+.contact-value a {
+  color: var(--primary);
+  font-weight: 600;
+}
+
+.contact-value a:hover {
+  text-decoration: underline;
+}
+
+.contact-empty {
+  color: var(--text-light);
+  font-size: 0.95rem;
+}
+
+/* ---------- Admin: Pages Tab ---------- */
+.admin-form-note {
+  margin-bottom: 1rem;
+  font-size: 0.85rem;
+  color: var(--text-light);
+}
+
+#tab-pages .checkout-section + .checkout-section {
+  margin-top: 1.5rem;
+}
+
+@media (max-width: 768px) {
+  .page-article {
+    padding: 0.5rem 0;
+  }
+
+  .contact-card {
+    padding: 1.1rem;
+  }
+
+  .contact-row {
+    flex-direction: column;
+    gap: 0.15rem;
+  }
+
+  .contact-label {
+    flex: none;
+  }
+}
+

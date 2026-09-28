@@ -3,10 +3,10 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Checkout - GreenLeaf Plants</title>
+  <title>Contact Us - GreenLeaf Plants</title>
   <link rel="stylesheet" href="css/styles.css" />
 </head>
-<body>
+<body data-page="contact">
   <header class="site-header">
     <div class="header-inner">
       <a href="index.html" class="logo"><span>🌿</span> GreenLeaf Plants</a>
@@ -17,7 +17,7 @@
         <a href="index.html">Home</a>
         <a href="products.html?category=indoor">Indoor</a>
         <a href="products.html?category=outdoor">Outdoor</a>
-<a href="products.html">All Plants</a>
+        <a href="products.html">All Plants</a>
         <a href="orders.html">My Orders</a>
         <a href="cart.html" class="cart-link">🛒<span class="cart-count" id="cart-count">0</span></a>
         <span id="auth-nav"></span>
@@ -27,10 +27,15 @@
   </header>
 
   <main class="container">
-    <h1 class="section-title">Checkout</h1>
-    <div id="checkout-container">
-      <div class="empty"><h2>Loading...</h2></div>
-    </div>
+    <article class="page-article">
+      <h1 class="page-header" id="page-title">Contact Us</h1>
+      <div class="page-content" id="page-body">
+        <!-- Populated by JS from /api/pages/contact -->
+      </div>
+      <div id="page-details">
+        <!-- Populated by JS from /api/settings -->
+      </div>
+    </article>
   </main>
 
   <footer class="site-footer">
@@ -41,12 +46,11 @@
     <p class="footer-text">&copy; 2026 GreenLeaf Plants. All rights reserved.</p>
   </footer>
 
-<script src="js/api.js"></script>
+  <script src="js/api.js"></script>
   <script src="js/cart.js"></script>
   <script src="js/auth.js"></script>
   <script src="js/main.js"></script>
   <script src="js/footer.js"></script>
-  <script src="js/qrcode.js"></script>
-  <script src="js/checkout.js"></script>
+  <script src="js/page.js"></script>
 </body>
 </html>

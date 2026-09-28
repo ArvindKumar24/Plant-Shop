@@ -98,6 +98,19 @@ const API = {
     return res.json();
   },
 
+  // ---------- Site Content (public) ----------
+  // GET site settings (footer text, contact details, UPI)
+  getSettings: async () => {
+    const res = await fetch("/api/settings");
+    return res.json();
+  },
+
+  // GET an admin-editable content page by slug
+  getPage: async (slug) => {
+    const res = await fetch(`/api/pages/${encodeURIComponent(slug)}`);
+    return res.json();
+  },
+
   // ---------- Admin ----------
   adminLogin: async (username, password) => {
     const res = await fetch("/api/admin/login", {
@@ -171,6 +184,38 @@ const API = {
     const res = await fetch(`/api/admin/reviews/${id}`, {
       method: "DELETE",
       headers: { Authorization: `Bearer ${token}` },
+    });
+    return res.json();
+  },
+
+  adminGetSettings: async (token) => {
+    const res = await fetch("/api/admin/settings", {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    return res.json();
+  },
+
+  adminUpdateSettings: async (token, settings) => {
+    const res = await fetch("/api/admin/settings", {
+      method: "PUT",
+      headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
+      body: JSON.stringify(settings),
+    });
+    return res.json();
+  },
+
+  adminGetPages: async (token) => {
+    const res = await fetch("/api/admin/pages", {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    return res.json();
+  },
+
+  adminUpdatePage: async (token, slug, page) => {
+    const res = await fetch(`/api/admin/pages/${encodeURIComponent(slug)}`, {
+      method: "PUT",
+      headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
+      body: JSON.stringify(page),
     });
     return res.json();
   },

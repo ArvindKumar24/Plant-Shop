@@ -17,6 +17,8 @@ function setAuth(token) {
     loadProducts();
     loadOrders();
     loadReviews();
+    loadSettings();
+    loadPages();
   } else {
     localStorage.removeItem("plant_shop_admin_token");
     loginView.style.display = "block";
@@ -288,7 +290,7 @@ async function deleteReview(id) {
   }
 }
 
-// ---------- UPI Settings ----------
+// ---------- Site Settings ----------
 /** Generate a QR code as a data URL (blank if the library is unavailable). */
 function generateQrDataUrl(text, cellSize = 8, margin = 2) {
   if (typeof qrcode !== "function") return "";
@@ -298,22 +300,158 @@ function generateQrDataUrl(text, cellSize = 8, margin = 2) {
   return qr.createDataURL(cellSize, margin);
 }
 
-/** Render the admin UPI QR from the current ID/name inputs. */
+/** Render the admin UPI QR preview from the current ID/name inputs. */
 function refreshSettingsQr() {
   const upiId = document.getElementById("upi-id").value.trim();
   const name = document.getElementById("upi-name").value.trim();
-  if (!upiId) { alert("UPI ID is required."); return; }
+  const img = document.getElementById("settings-qr");
+  if (!img) return;
+  if (!upiId) {
+    img.removeAttribute("src");
+    return;
+  }
   const data = `upi://pay?pa=${encodeURIComponent(upiId)}&pn=${encodeURIComponent(name)}`;
-  document.getElementById("settings-qr").src = generateQrDataUrl(data);
+  img.src = generateQrDataUrl(data);
 }
 
-document.getElementById("save-upi-btn").addEventListener("click", () => {
+/** Read the current values of the footer + contact fields. */
+function readContactSettings() {
+  return {
+    footer_text: document.getElementById("footer-text").value.trim(),
+    contact_email: document.getElementById("contact-email").value.trim(),
+    contact_phone: document.getElementById("contact-phone").value.trim(),
+    contact_address: document.getElementById("contact-address").value.trim(),
+    contact_hours: document.getElementById("contact-hours").value.trim(),
+    facebook_url: document.getElementById("facebook-url").value.trim(),
+    instagram_url: document.getElementById("instagram-url").value.trim(),
+  };
+}
+
+/** Fill the footer + contact inputs from the saved settings. */
+function fillContactSettings(settings) {
+  const s = settings || {};
+  const fields = {
+    "footer-text": s.footer_text,
+    "contact-email": s.contact_email,
+    "contact-phone": s.contact_phone,
+    "contact-address": s.contact_address,
+    "contact-hours": s.contact_hours,
+    "facebook-url": s.facebook_url,
+    "instagram-url": s.instagram_url,
+  };
+  Object.keys(fields).forEach((id) => {
+    const el = document.getElementById(id);
+    if (el) el.value = fields[id] == null ? "" : fields[id];
+  });
+}
+
+/** Load all site settings into the Settings tab. */
+async function loadSettings() {
+  const result = await API.adminGetSettings(adminToken);
+  if (result.error) { setAuth(""); return; }
+  const settings = result.settings || {};
+  fillContactSettings(settings);
+  document.getElementById("upi-id").value = settings.upi_id || "";
+  document.getElementById("upi-name").value = settings.upi_name || "";
   refreshSettingsQr();
-  showToast("QR code updated");
+}
+
+/**
+ * PUT the given settings. Missing keys are filled from the currently
+ * displayed inputs so each Save button only persists its own group.
+ */
+async function saveSettings(patch, successMessage) {
+  const current = readContactSettings();
+  current.upi_id = document.getElementById("upi-id").value.trim();
+  current.upi_name = document.getElementById("upi-name").value.trim();
+  Object.assign(current, patch);
+
+  let result;
+  try {
+    result = await API.adminUpdateSettings(adminToken, current);
+  } catch (err) {
+    alert("Could not reach the server.");
+    return false;
+  }
+  if (result.success) {
+    showToast(successMessage);
+  } else {
+    alert(result.error || "Could not save settings.");
+  }
+  return result.success;
+}
+
+document.getElementById("save-footer-btn").addEventListener("click", () => {
+  const footerText = document.getElementById("footer-text").value.trim();
+  if (!footerText) { alert("Footer text is required."); return; }
+  saveSettings({ footer_text: footerText }, "Footer text saved");
 });
 
-// Generate the QR immediately on load so the admin always sees it (no external service).
-refreshSettingsQr();
+document.getElementById("save-contact-btn").addEventListener("click", () => {
+  saveSettings({}, "Contact details saved");
+});
+
+document.getElementById("save-upi-btn").addEventListener("click", async () => {
+  const upiId = document.getElementById("upi-id").value.trim();
+  if (!upiId) { alert("UPI ID is required."); return; }
+  const saved = await saveSettings(
+    { upi_id: upiId, upi_name: document.getElementById("upi-name").value.trim() },
+    "UPI settings saved"
+  );
+  if (saved) refreshSettingsQr();
+});
+
+// Keep the QR preview in sync while typing.
+document.getElementById("upi-id").addEventListener("input", refreshSettingsQr);
+document.getElementById("upi-name").addEventListener("input", refreshSettingsQr);
+
+// ---------- Pages ----------
+/** Render one editor per editable page into #pages-editor. */
+async function loadPages() {
+  const container = document.getElementById("pages-editor");
+  const result = await API.adminGetPages(adminToken);
+  if (result.error) { setAuth(""); return; }
+  const pages = result.pages || [];
+  if (!container) return;
+
+  container.innerHTML = pages.length
+    ? pages
+        .map(
+          (p) => `
+      <div class="checkout-section">
+        <h3>${escapeHtml(p.slug)} <span style="font-weight:400;font-size:0.8rem;color:var(--text-light)">/${escapeHtml(p.slug)}.html</span></h3>
+        <div class="form-group">
+          <label>Title</label>
+          <input type="text" id="page-title-${escapeHtml(p.slug)}" value="${escapeHtml(p.title || "")}" />
+        </div>
+        <div class="form-group">
+          <label>Content</label>
+          <textarea id="page-content-${escapeHtml(p.slug)}" rows="8">${escapeHtml(p.content || "")}</textarea>
+        </div>
+        <button class="btn" onclick="savePage('${escapeHtml(p.slug)}')">Save Page</button>
+      </div>`
+        )
+        .join("")
+    : `<div class="empty"><h2>No pages found</h2><p>Run the database migration to create the About and Contact pages.</p></div>`;
+}
+
+/** Persist one page's title + content. */
+async function savePage(slug) {
+  const title = document.getElementById(`page-title-${slug}`);
+  const content = document.getElementById(`page-content-${slug}`);
+  if (!title || !content) return;
+  if (!title.value.trim()) { alert("Title is required."); return; }
+
+  const result = await API.adminUpdatePage(adminToken, slug, {
+    title: title.value.trim(),
+    content: content.value.trim(),
+  }).catch(() => ({ error: "Could not reach the server." }));
+  if (result.success) {
+    showToast(`"${slug}" page saved`);
+  } else {
+    alert(result.error || "Could not save page.");
+  }
+}
 
 // ---------- View Store ----------
 // When the admin clicks "View Store", clear the customer auth so the

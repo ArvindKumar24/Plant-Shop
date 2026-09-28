@@ -11,6 +11,7 @@ Run locally (optional):
 import base64
 import hashlib
 import os
+import re
 import sys
 import urllib.parse
 from datetime import datetime, date
@@ -85,6 +86,78 @@ def parse_product(data):
         "description": description,
         "image_url": image_url,
     }, None
+
+
+# Fallback values used when the site_settings row is missing, so the public
+# /api/settings endpoint always returns a complete object.
+DEFAULT_SETTINGS = {
+    "footer_text": "© 2026 GreenLeaf Plants. All rights reserved.",
+    "contact_email": "",
+    "contact_phone": "",
+    "contact_address": "",
+    "contact_hours": "",
+    "facebook_url": "",
+    "instagram_url": "",
+    "upi_id": "greenleaf@upi",
+    "upi_name": "GreenLeaf Plants",
+}
+
+# Slugs are used to build a filename-ish route and are echoed back to the
+# client, so keep them to a strict lowercase slug charset.
+SLUG_RE = re.compile(r"^[a-z0-9-]{1,50}$")
+
+MAX_PAGE_CONTENT = 20000
+
+# Settings columns that must be a valid absolute URL when non-empty.
+_URL_FIELDS = ("facebook_url", "instagram_url")
+
+
+def parse_page(data):
+    """Validate and normalize an editable content page from a request."""
+    slug = str(data.get("slug", "")).strip().lower()
+    title = str(data.get("title", "")).strip()
+    content = str(data.get("content", "")).strip()
+
+    if not SLUG_RE.match(slug):
+        return None, "Slug must be 1-50 characters of a-z, 0-9 or hyphens"
+    if not title:
+        return None, "Title is required"
+    if len(title) > 150:
+        return None, "Title must be 150 characters or fewer"
+    if len(content) > MAX_PAGE_CONTENT:
+        return None, f"Content must be {MAX_PAGE_CONTENT} characters or fewer"
+
+    return {"slug": slug, "title": title, "content": content}, None
+
+
+def parse_settings(data):
+    """Validate and normalize site settings from a request.
+
+    Every field is optional: a blank value is stored as an empty string and
+    the frontend simply hides that field.
+    """
+    settings = {key: str(data.get(key, "")).strip() for key in DEFAULT_SETTINGS}
+
+    if not settings["footer_text"]:
+        return None, "Footer text is required"
+    if len(settings["footer_text"]) > 255:
+        return None, "Footer text must be 255 characters or fewer"
+    if len(settings["contact_email"]) > 255:
+        return None, "Contact email must be 255 characters or fewer"
+    if len(settings["contact_phone"]) > 50:
+        return None, "Contact phone must be 50 characters or fewer"
+    if len(settings["contact_hours"]) > 255:
+        return None, "Business hours must be 255 characters or fewer"
+    if len(settings["upi_id"]) > 100:
+        return None, "UPI ID must be 100 characters or fewer"
+    if len(settings["upi_name"]) > 150:
+        return None, "UPI payee name must be 150 characters or fewer"
+
+    for field in _URL_FIELDS:
+        if settings[field] and not settings[field].startswith(("http://", "https://")):
+            return None, f"{field.replace('_', ' ').capitalize()} must start with http:// or https://"
+
+    return settings, None
 
 
 def _check_user():
@@ -412,6 +485,31 @@ def handle_create_order():
         return _json({"error": str(e)}, 500)
 
 
+@app.route("/api/settings", methods=["GET"])
+def handle_settings():
+    """GET /api/settings - public site settings (footer, contact, UPI)."""
+    row = query("SELECT * FROM site_settings WHERE id = 1", fetchone=True)
+    if not row:
+        return _json({"settings": dict(DEFAULT_SETTINGS)})
+    # Optional columns come back as null until an admin fills them in.
+    settings = {key: row.get(key) for key in DEFAULT_SETTINGS}
+    return _json({"settings": {k: v if v is not None else DEFAULT_SETTINGS[k]
+                               for k, v in settings.items()}})
+
+
+@app.route("/api/pages/<slug>", methods=["GET"])
+def handle_page(slug):
+    """GET /api/pages/<slug> - public editable content page."""
+    page = query(
+        "SELECT slug, title, content, updated_at FROM pages WHERE slug = %s",
+        (slug,),
+        fetchone=True,
+    )
+    if not page:
+        return _json({"error": "Page not found"}, 404)
+    return _json({"page": page})
+
+
 # ---------------------------------------------------------------------------
 # Admin API
 # ---------------------------------------------------------------------------
@@ -558,6 +656,78 @@ def handle_admin_delete_review(rid):
     if rowcount == 0:
         return _json({"error": "Review not found"}, 404)
     return _json({"success": True, "id": rid})
+
+
+@app.route("/api/admin/settings", methods=["GET"])
+def handle_admin_settings():
+    if not _check_admin():
+        return _json({"error": "Unauthorized"}, 401)
+    row = query("SELECT * FROM site_settings WHERE id = 1", fetchone=True)
+    if not row:
+        return _json({"settings": dict(DEFAULT_SETTINGS)})
+    return _json({"settings": {key: row.get(key) for key in DEFAULT_SETTINGS}})
+
+
+@app.route("/api/admin/settings", methods=["PUT"])
+def handle_admin_update_settings():
+    """PUT /api/admin/settings - update the single settings row."""
+    if not _check_admin():
+        return _json({"error": "Unauthorized"}, 401)
+    data = request.get_json(silent=True) or {}
+    settings, err = parse_settings(data)
+    if err:
+        return _json({"error": err}, 400)
+    execute(
+        """INSERT INTO site_settings
+           (id, footer_text, contact_email, contact_phone, contact_address,
+            contact_hours, facebook_url, instagram_url, upi_id, upi_name, updated_at)
+           VALUES (1, %s, %s, %s, %s, %s, %s, %s, %s, %s, now())
+           ON CONFLICT (id) DO UPDATE SET
+             footer_text     = EXCLUDED.footer_text,
+             contact_email   = EXCLUDED.contact_email,
+             contact_phone   = EXCLUDED.contact_phone,
+             contact_address = EXCLUDED.contact_address,
+             contact_hours   = EXCLUDED.contact_hours,
+             facebook_url    = EXCLUDED.facebook_url,
+             instagram_url   = EXCLUDED.instagram_url,
+             upi_id          = EXCLUDED.upi_id,
+             upi_name        = EXCLUDED.upi_name,
+             updated_at      = now()""",
+        (settings["footer_text"], settings["contact_email"], settings["contact_phone"],
+         settings["contact_address"], settings["contact_hours"], settings["facebook_url"],
+         settings["instagram_url"], settings["upi_id"], settings["upi_name"]),
+    )
+    return _json({"success": True, "settings": settings})
+
+
+@app.route("/api/admin/pages", methods=["GET"])
+def handle_admin_pages():
+    """GET /api/admin/pages - list all editable content pages."""
+    if not _check_admin():
+        return _json({"error": "Unauthorized"}, 401)
+    pages = query("SELECT slug, title, content, updated_at FROM pages ORDER BY slug")
+    return _json({"pages": pages})
+
+
+@app.route("/api/admin/pages/<slug>", methods=["PUT"])
+def handle_admin_update_page(slug):
+    """PUT /api/admin/pages/<slug> - update an existing content page."""
+    if not _check_admin():
+        return _json({"error": "Unauthorized"}, 401)
+    existing = query("SELECT slug FROM pages WHERE slug = %s", (slug,), fetchone=True)
+    if not existing:
+        return _json({"error": "Page not found"}, 404)
+    data = request.get_json(silent=True) or {}
+    # Ignore any slug in the body: the URL is the source of truth.
+    data = dict(data, slug=slug)
+    page, err = parse_page(data)
+    if err:
+        return _json({"error": err}, 400)
+    execute(
+        "UPDATE pages SET title = %s, content = %s, updated_at = now() WHERE slug = %s",
+        (page["title"], page["content"], slug),
+    )
+    return _json({"success": True, "page": page})
 
 
 # ---------------------------------------------------------------------------
